@@ -32,6 +32,7 @@
             this.lstvApps = new System.Windows.Forms.ListView();
             this.panel1 = new System.Windows.Forms.Panel();
             this.lbOSinfo = new System.Windows.Forms.Label();
+            this.lbComputerName = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -68,6 +69,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.lbComputerName);
             this.panel1.Controls.Add(this.lbOSinfo);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 3);
@@ -78,10 +80,20 @@
             // lbOSinfo
             // 
             this.lbOSinfo.AutoSize = true;
-            this.lbOSinfo.Location = new System.Drawing.Point(27, 20);
+            this.lbOSinfo.Location = new System.Drawing.Point(18, 18);
             this.lbOSinfo.Name = "lbOSinfo";
-            this.lbOSinfo.Size = new System.Drawing.Size(0, 13);
+            this.lbOSinfo.Size = new System.Drawing.Size(42, 13);
             this.lbOSinfo.TabIndex = 0;
+            this.lbOSinfo.Text = "OS info";
+            // 
+            // lbComputerName
+            // 
+            this.lbComputerName.AutoSize = true;
+            this.lbComputerName.Location = new System.Drawing.Point(18, 49);
+            this.lbComputerName.Name = "lbComputerName";
+            this.lbComputerName.Size = new System.Drawing.Size(52, 13);
+            this.lbComputerName.TabIndex = 1;
+            this.lbComputerName.Text = "PC Name";
             // 
             // Form1
             // 
@@ -105,6 +117,7 @@
         private System.Windows.Forms.ListView lstvApps;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label lbOSinfo;
+        private System.Windows.Forms.Label lbComputerName;
     }
 }
 

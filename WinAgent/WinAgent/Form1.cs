@@ -26,24 +26,16 @@ namespace WinAgent
         {
             lstvApps.Columns.Add("No");
             lstvApps.Columns.Add("Name");
-            lstvApps.Columns.Add("Path");
+            // lstvApps.Columns.Add("Path");
             lstvApps.Columns.Add("Version");
             lstvApps.Columns[0].Width = 30;
-            lstvApps.Columns[1].Width = 150;
-            lstvApps.Columns[2].Width = 300;
-            lstvApps.Columns[3].Width = 70;
+            lstvApps.Columns[1].Width = 300;
+            lstvApps.Columns[2].Width = 200;
+            // lstvApps.Columns[3].Width = 70;
 
-            string w_strOSinfo = string.Empty;
-            OperatingSystem os = Environment.OSVersion;
-            // w_strOSinfo += os.Version.ToString();
-            // w_strOSinfo += os.Platform.ToString();
-            // w_strOSinfo += os.ServicePack.ToString();
-            // w_strOSinfo += os.VersionString.ToString();
-
-            w_strOSinfo = os.VersionString;
-            w_strOSinfo += $"\r\n{RuntimeInformation.OSDescription}";
-
-            lbOSinfo.Text = w_strOSinfo;
+            lbOSinfo.Text = "Operating System: " + OSInfoHelper.getOSFullName() + $" {OSInfoHelper.getOSbit()} ({OSInfoHelper.getOSVersion()})";
+            lbOSinfo.Text += $" {OSInfoHelper.getOSDescription()}";
+            lbComputerName.Text = "Computer Name: " + OSInfoHelper.getMachineName();
 
             /*string registry_key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
             using (Microsoft.Win32.RegistryKey key = Registry.LocalMachine.OpenSubKey(registry_key))
@@ -87,7 +79,7 @@ namespace WinAgent
             {
                 ListViewItem w_lvmInstalledApp = new ListViewItem((lstvApps.Items.Count + 1).ToString());
                 w_lvmInstalledApp.SubItems.Add(app.DisplayName);
-                w_lvmInstalledApp.SubItems.Add(app.InstallationLocation);
+                // w_lvmInstalledApp.SubItems.Add(app.InstallationLocation);
                 w_lvmInstalledApp.SubItems.Add(app.DisplayVersion);
                 lstvApps.Items.Add(w_lvmInstalledApp);
             }

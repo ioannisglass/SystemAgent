@@ -1,7 +1,9 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.VisualBasic.Devices;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using WinAgent.BaseModel;
@@ -10,6 +12,43 @@ namespace WinAgent.Helpers
 {
     public static class OSInfoHelper
     {
+        public static string getOSDescription()
+        {
+            string w_strOSinfo = string.Empty;
+            OperatingSystem os = Environment.OSVersion;
+            // w_strOSinfo += " " + os.Platform.ToString();
+            // w_strOSinfo += " " + os.ServicePack.ToString();
+            // w_strOSinfo += " " + os.VersionString.ToString();
+
+            w_strOSinfo += $"{RuntimeInformation.OSDescription}";
+
+            return w_strOSinfo;
+        }
+        public static string getOSPlatform()            // WinNT
+        {
+            return new ComputerInfo().OSPlatform;
+        }
+        public static string getOSVersion()             // 6.1.7601
+        {
+            return new ComputerInfo().OSVersion;
+        }
+        public static string getOSFullName()            // Mircrosoft Windows 7 Ultimate
+        {
+            return new ComputerInfo().OSFullName;
+        }
+
+        public static string getMachineName()
+        {
+            return Environment.MachineName;
+        }
+        public static string getOSbit()
+        {
+            if (Environment.Is64BitOperatingSystem)
+                return "64bit";
+            else
+                return "32bit";
+        }
+
         private static List<MInstalledApp> GetInstalledApplication(RegistryKey regKey, string registryKey)
         {
             List<MInstalledApp> list = new List<MInstalledApp>();
