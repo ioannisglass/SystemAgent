@@ -37,43 +37,6 @@ namespace WinAgent
             lbOSinfo.Text += $" {OSInfoHelper.getOSDescription()}";
             lbComputerName.Text = "Computer Name: " + OSInfoHelper.getMachineName();
 
-            /*string registry_key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
-            using (Microsoft.Win32.RegistryKey key = Registry.LocalMachine.OpenSubKey(registry_key))
-            {
-                foreach (string subkey_name in key.GetSubKeyNames())
-                {
-                    using (RegistryKey subkey = key.OpenSubKey(subkey_name))
-                    {
-                        ListViewItem w_lvmInstalledApp = new ListViewItem((lstvApps.Items.Count + 1).ToString());
-                        object w_objDispName = subkey.GetValue("DisplayName");
-                        if (w_objDispName != null)
-                        {
-                            w_lvmInstalledApp.SubItems.Add(subkey.GetValue("DisplayName").ToString());
-                            lstvApps.Items.Add(w_lvmInstalledApp);
-                        }
-                    }
-                }
-            }
-
-            string query = "SELECT Name, Version FROM Win32_Product";
-
-            // Create a new ManagementObjectSearcher with the query
-            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(query))
-            {
-                // Execute the query and get the result
-                ManagementObjectCollection results = searcher.Get();
-
-                // Iterate over the result and print the installed apps
-                foreach (ManagementObject app in results)
-                {
-                    ListViewItem w_lvmInstalledApp = new ListViewItem((lstvApps.Items.Count + 1).ToString());
-                    w_lvmInstalledApp.SubItems.Add(app["Name"]?.ToString());
-                    w_lvmInstalledApp.SubItems.Add(app["Version"]?.ToString());
-                    lstvApps.Items.Add(w_lvmInstalledApp);
-
-                }
-            }*/
-
             List<MInstalledApp> w_lstmInstalledApp = OSInfoHelper.GetFullListInstalledApplication();
             foreach(MInstalledApp app in w_lstmInstalledApp)
             {

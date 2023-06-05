@@ -49,6 +49,34 @@ namespace WinAgent.Helpers
                 return "32bit";
         }
 
+        /*
+         DisplayName ==> ProductName property
+         DisplayVersion ==> Derived from ProductVersion property
+         Publisher ==> Manufacturer property
+         VersionMinor ==> Derived from ProductVersion property
+         VersionMajor ==> Derived from ProductVersion property
+         Version ==> Derived from ProductVersion property
+         HelpLink ==> ARPHELPLINK property
+         HelpTelephone ==> ARPHELPTELEPHONE property
+         InstallDate ==> The last time this product received service. 
+         The value of this property is replaced each time a patch is applied or removed from 
+         the product or the /v Command-Line Option is used to repair the product. 
+         If the product has received no repairs or patches this property contains 
+         the time this product was installed on this computer.
+         InstallLocation ==> ARPINSTALLLOCATION property
+         InstallSource ==> SourceDir property
+         URLInfoAbout ==> ARPURLINFOABOUT property
+         URLUpdateInfo ==> ARPURLUPDATEINFO property
+         AuthorizedCDFPrefix ==> ARPAUTHORIZEDCDFPREFIX property
+         Comments ==> Comments provided to the Add or Remove Programs control panel.
+         Contact ==> Contact provided to the Add or Remove Programs control panel.
+         EstimatedSize ==> Determined and set by the Windows Installer.
+         Language ==> ProductLanguage property
+         ModifyPath ==> Determined and set by the Windows Installer.
+         Readme ==> Readme provided to the Add or Remove Programs control panel.
+         UninstallString ==> Determined and set by Windows Installer.
+         SettingsIdentifier ==> MSIARPSETTINGSIDENTIFIER property
+         */
         private static List<MInstalledApp> GetInstalledApplication(RegistryKey regKey, string registryKey)
         {
             List<MInstalledApp> list = new List<MInstalledApp>();

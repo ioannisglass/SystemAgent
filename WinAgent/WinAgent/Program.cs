@@ -16,6 +16,11 @@ namespace WinAgent
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            frmActivate w_frmActivate = new frmActivate();
+            if (w_frmActivate.ShowDialog() != DialogResult.OK)
+                Environment.Exit(0);
+
             Application.Run(new Form1());
         }
     }
