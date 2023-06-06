@@ -15,10 +15,13 @@ namespace WinAgent
         public frmActivate()
         {
             InitializeComponent();
+            txtActID.Text = Program.g_setting.activation_key;
+            txtCusID.Text = Program.g_setting.customer_id;
         }
 
         private void btnNext_Click(object sender, EventArgs e)
         {
+
             this.DialogResult = DialogResult.OK;
             this.Close();
         }

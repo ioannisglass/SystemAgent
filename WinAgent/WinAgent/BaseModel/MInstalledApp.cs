@@ -11,5 +11,6 @@ namespace WinAgent.BaseModel
         public string DisplayName { get; set; }
         public string InstallationLocation { get; set; }
         public string DisplayVersion { get; set; }
+        public string Publisher { get; set; }
     }
 }

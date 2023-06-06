@@ -27,10 +27,13 @@ QString OSInfoHelper::getMachineName()
     return "";
 }
 
-QList<MInstalledApp*> getInstalledThirdPartySoftware()
+QList<MInstalledApp*> OSInfoHelper::getInstalledThirdPartySoftware()
 {
     QSettings settings("HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall", QSettings::NativeFormat);
+    QSettings settings64("HKEY_LOCAL_MACHINE\\Software\\WoW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall", QSettings::NativeFormat);
     QStringList softwareKeys = settings.childGroups();
+    QStringList softwareKeys64 = settings64.childGroups();
+    softwareKeys.append(softwareKeys64);
     QList<MInstalledApp*> w_lstmInstalledApp;
 
     foreach (const QString &softwareKey, softwareKeys) {

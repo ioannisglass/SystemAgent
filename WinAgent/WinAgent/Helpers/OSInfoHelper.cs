@@ -127,5 +127,55 @@ namespace WinAgent.Helpers
 
             return finalList.OrderBy(o => o.DisplayName).ToList();
         }
+
+        public static List<MInstalledApp> getFullThirdPartyApps()
+        {
+            string registry_key_32 = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+            string registry_key_64 = @"SOFTWARE\WoW6432Node\Microsoft\Windows\CurrentVersion\Uninstall";
+            IEnumerable<MInstalledApp> finalList = new List<MInstalledApp>();
+            List<MInstalledApp> win32AppsCU = getThirdPartyApps(Registry.CurrentUser, registry_key_32);
+            List<MInstalledApp> win64AppsCU = getThirdPartyApps(Registry.CurrentUser, registry_key_64);
+            
+            finalList = win32AppsCU.Concat(win64AppsCU);
+
+            finalList = finalList.GroupBy(d => d.DisplayName).Select(d => d.First());
+
+            return finalList.OrderBy(o => o.DisplayName).ToList();
+        }
+
+        public static List<MInstalledApp> getThirdPartyApps(RegistryKey regKey, string registryKey)
+        {
+            RegistryKey uninstallKey = regKey.OpenSubKey(registryKey);
+            List<MInstalledApp> list = new List<MInstalledApp>();
+            if (uninstallKey != null)
+            {
+                foreach (string subKeyName in uninstallKey.GetSubKeyNames())
+                {
+                    RegistryKey subKey = uninstallKey.OpenSubKey(subKeyName);
+                    string displayName = subKey.GetValue("DisplayName") as string;
+                    string displayVersion = subKey.GetValue("DisplayVersion") as string;
+                    string publisher = subKey.GetValue("Publisher") as string;
+                    bool isSystemComponent = Convert.ToBoolean(subKey.GetValue("SystemComponent", 0));
+
+                    if (!string.IsNullOrEmpty(displayName) && !isSystemComponent && !IsMicrosoftStoreApp(publisher))
+                    {
+                        list.Add(new MInstalledApp()
+                        {
+                            DisplayName = displayName.Trim(),
+                            InstallationLocation = "",
+                            DisplayVersion = displayVersion ?? "Unknown",
+                            Publisher = publisher ?? "Unknown"
+                        });
+                    }
+                }
+            }
+            return list;
+        }
+
+        static bool IsMicrosoftStoreApp(string publisher)
+        {
+            // Add any specific criteria to identify Microsoft Store apps
+            return publisher?.Contains("Microsoft Corporation") ?? false;
+        }
     }
 }

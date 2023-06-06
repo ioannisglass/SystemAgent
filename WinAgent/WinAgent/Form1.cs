@@ -37,8 +37,9 @@ namespace WinAgent
             lbOSinfo.Text += $" {OSInfoHelper.getOSDescription()}";
             lbComputerName.Text = "Computer Name: " + OSInfoHelper.getMachineName();
 
-            List<MInstalledApp> w_lstmInstalledApp = OSInfoHelper.GetFullListInstalledApplication();
-            foreach(MInstalledApp app in w_lstmInstalledApp)
+            // List<MInstalledApp> w_lstmInstalledApp = OSInfoHelper.GetFullListInstalledApplication();
+            List<MInstalledApp> w_lstmInstalledApp = OSInfoHelper.getFullThirdPartyApps();
+            foreach (MInstalledApp app in w_lstmInstalledApp)
             {
                 ListViewItem w_lvmInstalledApp = new ListViewItem((lstvApps.Items.Count + 1).ToString());
                 w_lvmInstalledApp.SubItems.Add(app.DisplayName);
