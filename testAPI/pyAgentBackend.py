@@ -12,6 +12,18 @@ def greet():
     name = request.args.get('name', 'Guest')
     return f'Hello, {name}!'
 
+@app.route('/auth', methods=['POST'])
+def auth():
+    data = request.get_json()
+    cusid = data["cusid"]
+    actkey = data["actkey"]
+    if cusid == "testagent1" and actkey == "activationkey1":
+        return "2"
+    elif cusid == "testagent1" and actkey != "activationkey1":
+        return "1"
+    else:
+        return "0"
+
 @app.route('/submit', methods=['POST'])
 def submit():
     data = request.get_json()

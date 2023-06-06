@@ -33,7 +33,7 @@
             this.txtCusID = new System.Windows.Forms.TextBox();
             this.txtActID = new System.Windows.Forms.TextBox();
             this.btnNext = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
+            this.lbActivateResult = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -82,16 +82,16 @@
             this.btnNext.UseVisualStyleBackColor = true;
             this.btnNext.Click += new System.EventHandler(this.btnNext_Click);
             // 
-            // label3
+            // lbActivateResult
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.ForeColor = System.Drawing.Color.Red;
-            this.label3.Location = new System.Drawing.Point(28, 100);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(73, 15);
-            this.label3.TabIndex = 1;
-            this.label3.Text = "Activation ID";
+            this.lbActivateResult.AutoSize = true;
+            this.lbActivateResult.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbActivateResult.ForeColor = System.Drawing.Color.Red;
+            this.lbActivateResult.Location = new System.Drawing.Point(28, 100);
+            this.lbActivateResult.Name = "lbActivateResult";
+            this.lbActivateResult.Size = new System.Drawing.Size(73, 15);
+            this.lbActivateResult.TabIndex = 1;
+            this.lbActivateResult.Text = "Activation ID";
             // 
             // frmActivate
             // 
@@ -101,11 +101,12 @@
             this.Controls.Add(this.btnNext);
             this.Controls.Add(this.txtActID);
             this.Controls.Add(this.txtCusID);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.lbActivateResult);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Name = "frmActivate";
             this.Text = "Activate";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmActivate_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -118,6 +119,6 @@
         private System.Windows.Forms.TextBox txtCusID;
         private System.Windows.Forms.TextBox txtActID;
         private System.Windows.Forms.Button btnNext;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label lbActivateResult;
     }
 }
