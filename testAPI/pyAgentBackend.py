@@ -61,9 +61,9 @@ def activate():
     data = request.get_json()
     cusid = data["cusid"]
     actkey = data["actkey"]
-    if cusid == "testagent1" and actkey == "activationkey1":
+    if cusid == "customer1" and actkey == "activationkey1":
         return "2"      # Registered customer, Activated key
-    elif cusid == "testagent1" and actkey != "activationkey1":
+    elif cusid == "customer1" and actkey != "activationkey1":
         return "1"      # Registered customer, Un activated key
     else:
         return "0"      # Unregistered cutomer
@@ -74,7 +74,10 @@ def submit():
     data = request.get_json()
     # Process the submitted data
     #return 'Data submitted successfully'
-    return json.dumps(data)
+    response = {}
+    response["status"] = "success"
+    response["msg"] = 'Data submitted successfully'
+    return response
 
 @app.route('/api/agents')
 def get_agents():
