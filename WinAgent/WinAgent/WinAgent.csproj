@@ -76,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppSetting.cs" />
+    <Compile Include="BaseModel\MAgentData.cs" />
     <Compile Include="BaseModel\MAuth.cs" />
     <Compile Include="BaseModel\MInstalledApp.cs" />
     <Compile Include="ConstEnv.cs" />
@@ -91,7 +92,7 @@
     <Compile Include="frmActivate.Designer.cs">
       <DependentUpon>frmActivate.cs</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\LicenseHelper.cs" />
+    <Compile Include="Helpers\AgentHelper.cs" />
     <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Helpers\OSInfoHelper.cs" />
     <Compile Include="Helpers\WebReqHelper.cs" />

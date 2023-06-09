@@ -31,8 +31,9 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.lstvApps = new System.Windows.Forms.ListView();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.lbOSinfo = new System.Windows.Forms.Label();
             this.lbComputerName = new System.Windows.Forms.Label();
+            this.lbOSinfo = new System.Windows.Forms.Label();
+            this.btnPost = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -69,6 +70,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btnPost);
             this.panel1.Controls.Add(this.lbComputerName);
             this.panel1.Controls.Add(this.lbOSinfo);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -76,6 +78,15 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(794, 94);
             this.panel1.TabIndex = 1;
+            // 
+            // lbComputerName
+            // 
+            this.lbComputerName.AutoSize = true;
+            this.lbComputerName.Location = new System.Drawing.Point(18, 49);
+            this.lbComputerName.Name = "lbComputerName";
+            this.lbComputerName.Size = new System.Drawing.Size(52, 13);
+            this.lbComputerName.TabIndex = 1;
+            this.lbComputerName.Text = "PC Name";
             // 
             // lbOSinfo
             // 
@@ -86,14 +97,15 @@
             this.lbOSinfo.TabIndex = 0;
             this.lbOSinfo.Text = "OS info";
             // 
-            // lbComputerName
+            // btnPost
             // 
-            this.lbComputerName.AutoSize = true;
-            this.lbComputerName.Location = new System.Drawing.Point(18, 49);
-            this.lbComputerName.Name = "lbComputerName";
-            this.lbComputerName.Size = new System.Drawing.Size(52, 13);
-            this.lbComputerName.TabIndex = 1;
-            this.lbComputerName.Text = "PC Name";
+            this.btnPost.Location = new System.Drawing.Point(694, 58);
+            this.btnPost.Name = "btnPost";
+            this.btnPost.Size = new System.Drawing.Size(75, 23);
+            this.btnPost.TabIndex = 2;
+            this.btnPost.Text = "Post";
+            this.btnPost.UseVisualStyleBackColor = true;
+            this.btnPost.Click += new System.EventHandler(this.btnPost_Click);
             // 
             // Form1
             // 
@@ -118,6 +130,7 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label lbOSinfo;
         private System.Windows.Forms.Label lbComputerName;
+        private System.Windows.Forms.Button btnPost;
     }
 }
 

@@ -25,7 +25,7 @@ namespace WinAgent
         {
             Program.g_setting.activation_key = txtActID.Text.Trim();
             Program.g_setting.customer_id = txtCusID.Text.Trim();
-            int w_nRet = LicenseHelper.checkActivated(Program.g_setting.customer_id, Program.g_setting.activation_key);
+            int w_nRet = AgentHelper.checkActivated(Program.g_setting.customer_id, Program.g_setting.activation_key);
             if (w_nRet == ConstEnv.AGENT_REGISTERED)
             {
                 this.DialogResult = DialogResult.OK;

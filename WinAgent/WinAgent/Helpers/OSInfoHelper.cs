@@ -96,9 +96,9 @@ namespace WinAgent.Helpers
                             {
                                 list.Add(new MInstalledApp()
                                 {
-                                    DisplayName = displayName.Trim(),
-                                    InstallationLocation = installLocation,
-                                    DisplayVersion = version
+                                    displayName = displayName.Trim(),
+                                    installationLocation = installLocation,
+                                    displayVersion = version
                                 });
                             }
                         }
@@ -123,9 +123,9 @@ namespace WinAgent.Helpers
 
             finalList = win32AppsCU.Concat(win32AppsLM).Concat(win64AppsCU).Concat(win64AppsLM);
 
-            finalList = finalList.GroupBy(d => d.DisplayName).Select(d => d.First());
+            finalList = finalList.GroupBy(d => d.displayName).Select(d => d.First());
 
-            return finalList.OrderBy(o => o.DisplayName).ToList();
+            return finalList.OrderBy(o => o.displayName).ToList();
         }
 
         public static List<MInstalledApp> getFullThirdPartyApps()
@@ -138,9 +138,9 @@ namespace WinAgent.Helpers
             
             finalList = win32AppsCU.Concat(win64AppsCU);
 
-            finalList = finalList.GroupBy(d => d.DisplayName).Select(d => d.First());
+            finalList = finalList.GroupBy(d => d.displayName).Select(d => d.First());
 
-            return finalList.OrderBy(o => o.DisplayName).ToList();
+            return finalList.OrderBy(o => o.displayName).ToList();
         }
 
         public static List<MInstalledApp> getThirdPartyApps(RegistryKey regKey, string registryKey)
@@ -161,10 +161,10 @@ namespace WinAgent.Helpers
                     {
                         list.Add(new MInstalledApp()
                         {
-                            DisplayName = displayName.Trim(),
-                            InstallationLocation = "",
-                            DisplayVersion = displayVersion ?? "Unknown",
-                            Publisher = publisher ?? "Unknown"
+                            displayName = displayName.Trim(),
+                            installationLocation = "",
+                            displayVersion = displayVersion ?? "Unknown",
+                            publisher = publisher ?? "Unknown"
                         });
                     }
                 }

@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace WinAgent.BaseModel
 {
+    [Serializable]
     public class MInstalledApp
     {
-        public string DisplayName { get; set; }
-        public string InstallationLocation { get; set; }
-        public string DisplayVersion { get; set; }
-        public string Publisher { get; set; }
+        public string displayName { get; set; }
+        public string installationLocation { get; set; }
+        public string displayVersion { get; set; }
+        public string publisher { get; set; }
     }
 }

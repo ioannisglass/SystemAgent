@@ -42,11 +42,25 @@ namespace WinAgent
             foreach (MInstalledApp app in w_lstmInstalledApp)
             {
                 ListViewItem w_lvmInstalledApp = new ListViewItem((lstvApps.Items.Count + 1).ToString());
-                w_lvmInstalledApp.SubItems.Add(app.DisplayName);
+                w_lvmInstalledApp.SubItems.Add(app.displayName);
                 // w_lvmInstalledApp.SubItems.Add(app.InstallationLocation);
-                w_lvmInstalledApp.SubItems.Add(app.DisplayVersion);
+                w_lvmInstalledApp.SubItems.Add(app.displayVersion);
                 lstvApps.Items.Add(w_lvmInstalledApp);
             }
+        }
+
+        private void btnPost_Click(object sender, EventArgs e)
+        {
+            MAgentData w_mAgentData = new MAgentData();
+            w_mAgentData.osInfo = OSInfoHelper.getOSFullName() + $" {OSInfoHelper.getOSbit()} ({OSInfoHelper.getOSVersion()}) {OSInfoHelper.getOSDescription()}";
+            w_mAgentData.machineName = OSInfoHelper.getMachineName();
+            w_mAgentData.auth.cusid = Program.g_setting.customer_id;
+            w_mAgentData.auth.actkey = Program.g_setting.activation_key;
+
+            w_mAgentData.installedApps.AddRange(OSInfoHelper.getFullThirdPartyApps());
+
+            string w_strRet = AgentHelper.postAgentData(w_mAgentData);
+            MessageBox.Show(w_strRet);
         }
     }
 }
