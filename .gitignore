@@ -1,0 +1,14 @@
+.vs
+obj
+bin
+build-WinAgent-Desktop_Qt_6_5_0_MinGW_64_bit-Release
+build-WinAgent-Desktop_Qt_6_5_0_MinGW_64_bit-Debug
+build-WinAgent-Desktop_Qt_6_5_0_MinGW_64_bit-Profile
+packages
+/testAPI.pptx
+/userwebgui.png
+/agents.txt
+/agentsv1.txt
+localhost.session.sql
+.vscode
+__pycache__

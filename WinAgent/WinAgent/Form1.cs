@@ -52,7 +52,8 @@ namespace WinAgent
         private void btnPost_Click(object sender, EventArgs e)
         {
             MAgentData w_mAgentData = new MAgentData();
-            w_mAgentData.osInfo = OSInfoHelper.getOSFullName() + $" {OSInfoHelper.getOSbit()} ({OSInfoHelper.getOSVersion()}) {OSInfoHelper.getOSDescription()}";
+            w_mAgentData.osInfo = OSInfoHelper.getOSFullName() + $" {OSInfoHelper.getOSbit()} ({OSInfoHelper.getOSDescription()})";
+            w_mAgentData.version = OSInfoHelper.getOSVersion();
             w_mAgentData.machineName = OSInfoHelper.getMachineName();
             w_mAgentData.auth.cusid = Program.g_setting.customer_id;
             w_mAgentData.auth.actkey = Program.g_setting.activation_key;
