@@ -49,7 +49,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppSetting.cs" />
+    <Compile Include="BaseModel\MAgentData.cs" />
+    <Compile Include="BaseModel\MAuth.cs" />
+    <Compile Include="BaseModel\MInstalledApp.cs" />
     <Compile Include="BaseModule\ProcessInfo.cs" />
+    <Compile Include="ConstEnv.cs" />
+    <Compile Include="Helpers\AgentHelper.cs" />
+    <Compile Include="Helpers\Logger.cs" />
+    <Compile Include="Helpers\OSInfoHelper.cs" />
+    <Compile Include="Helpers\WebReqHelper.cs" />
     <Compile Include="ProcessExts.cs" />
     <Compile Include="ProcessExtensions.cs" />
     <Compile Include="ProjectInstaller.cs">
