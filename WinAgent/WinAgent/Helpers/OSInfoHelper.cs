@@ -135,8 +135,12 @@ namespace WinAgent.Helpers
             IEnumerable<MInstalledApp> finalList = new List<MInstalledApp>();
             List<MInstalledApp> win32AppsCU = getThirdPartyApps(Registry.CurrentUser, registry_key_32);
             List<MInstalledApp> win64AppsCU = getThirdPartyApps(Registry.CurrentUser, registry_key_64);
-            
+            List<MInstalledApp> win32AppsLM = getThirdPartyApps(Registry.LocalMachine, registry_key_32);
+            List<MInstalledApp> win64AppsLM = getThirdPartyApps(Registry.LocalMachine, registry_key_64);
+
             finalList = win32AppsCU.Concat(win64AppsCU);
+            finalList = finalList.Concat(win32AppsLM);
+            finalList = finalList.Concat(win64AppsLM);
 
             finalList = finalList.GroupBy(d => d.displayName).Select(d => d.First());
 
@@ -151,21 +155,28 @@ namespace WinAgent.Helpers
             {
                 foreach (string subKeyName in uninstallKey.GetSubKeyNames())
                 {
-                    RegistryKey subKey = uninstallKey.OpenSubKey(subKeyName);
-                    string displayName = subKey.GetValue("DisplayName") as string;
-                    string displayVersion = subKey.GetValue("DisplayVersion") as string;
-                    string publisher = subKey.GetValue("Publisher") as string;
-                    bool isSystemComponent = Convert.ToBoolean(subKey.GetValue("SystemComponent", 0));
-
-                    if (!string.IsNullOrEmpty(displayName) && !isSystemComponent && !IsMicrosoftStoreApp(publisher))
+                    try
                     {
-                        list.Add(new MInstalledApp()
+                        RegistryKey subKey = uninstallKey.OpenSubKey(subKeyName);
+                        string displayName = subKey.GetValue("DisplayName") as string;
+                        string displayVersion = subKey.GetValue("DisplayVersion") as string;
+                        string publisher = subKey.GetValue("Publisher") as string;
+                        bool isSystemComponent = Convert.ToBoolean(subKey.GetValue("SystemComponent", 0));
+
+                        if (!string.IsNullOrEmpty(displayName) && !isSystemComponent && !IsMicrosoftStoreApp(publisher))
                         {
-                            displayName = displayName.Trim(),
-                            installationLocation = "",
-                            displayVersion = displayVersion ?? "Unknown",
-                            publisher = publisher ?? "Unknown"
-                        });
+                            list.Add(new MInstalledApp()
+                            {
+                                displayName = displayName.Trim(),
+                                installationLocation = "",
+                                displayVersion = displayVersion ?? "Unknown",
+                                publisher = publisher ?? "Unknown"
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
                     }
                 }
             }

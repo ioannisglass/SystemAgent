@@ -53,7 +53,7 @@ namespace MailParser
     {
         public string customer_id = "testagent1";
         public string activation_key = "activationkey1";
-        public string api_base = "http://localhost:5000";
+        public string api_base = "http://192.168.8.171:5000";
         public string api_activate = "/api/activate";
         public string api_submit = "/api/submit";
     }

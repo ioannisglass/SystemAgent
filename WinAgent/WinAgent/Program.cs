@@ -1,4 +1,5 @@
-﻿using MailParser;
+﻿using Helpers;
+using MailParser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
