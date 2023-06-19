@@ -18,57 +18,6 @@ namespace WinAgentService
             return processlist;
         }
 
-        public void CheckProcessStatus(List<string> oldProcPaths, out List<string> updatedProcPaths)
-        {
-            updatedProcPaths = new List<string>();
-            try
-            {
-                File.AppendAllText(Program.g_log_path, oldProcPaths.Count.ToString() + "\n");    /////
-                if (oldProcPaths.Count != 0)
-                    foreach (string item in oldProcPaths)
-                        File.AppendAllText(Program.g_log_path, item + "\n");    /////
-
-                foreach (string oldProcName in oldProcPaths)
-                {
-                    bool flag = CheckRunning(oldProcName);
-                    File.AppendAllText(Program.g_log_path, oldProcName + $" : running {flag.ToString()}\n");    /////
-
-                    if (!flag)
-                    {
-                        File.AppendAllText(Program.g_log_path, oldProcName + " : EXITED\n");    /////
-                        RunAlert(oldProcName + " : EXITED");
-                        string notepadTxt = "EXITED : " + Path.GetFileNameWithoutExtension(oldProcName) + " " + oldProcName + " " + DateTime.Now.ToString("dd.MM.yyyy_hh:mm:ss_");
-                        RunNotePad(notepadTxt);
-                        RunCmdFlag(oldProcName);
-                    }
-                }
-
-
-                foreach (string baseProcName in Program.g_lstBaseProcList)
-                {
-                    if (CheckRunning(baseProcName))
-                    {
-                        File.AppendAllText(Program.g_log_path, baseProcName + $" is running.\n");    /////
-
-                        updatedProcPaths.Add(baseProcName);
-                        if (oldProcPaths.IndexOf(baseProcName) == -1)
-                        {
-                            File.AppendAllText(Program.g_log_path, baseProcName + " : STARTED\n");    /////
-                            RunAlert(baseProcName + " : STARTED");
-                            string notepadTxt = "STARTED : " + Path.GetFileNameWithoutExtension(baseProcName) + " " + baseProcName + " " + DateTime.Now.ToString("dd.MM.yyyy_hh:mm:ss_") + "\n";
-                            RunNotePad(notepadTxt);
-                            RunCmdFlag(baseProcName);
-                        }
-                    }
-                }
-                File.AppendAllText(Program.g_log_path, $"{updatedProcPaths.Count.ToString()}\n");    /////
-            }
-            catch(Exception exception)
-            {
-                File.AppendAllText(Program.g_log_path, $"ERROR : {exception.Message}");    /////
-            }
-        }
-
         public bool CheckRunning(string _proc_name)
         {
             Process[] processlist = Process.GetProcesses();
@@ -81,7 +30,7 @@ namespace WinAgentService
                 }
                 catch(Exception exception)
                 {
-                    
+                    Console.WriteLine(exception.Message);
                 }
             }
             return false;

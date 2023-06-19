@@ -7,11 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WinAgentService
+namespace WinAgentInstaller
 {
     public class AppSettings<T> where T : new()
     {
-        private const string DEFAULT_FILENAME = "settings.ini";
+        private const string DEFAULT_FILENAME = "api_config.ini";
 
         public void Save(string fileName = DEFAULT_FILENAME)
         {
@@ -21,7 +21,7 @@ namespace WinAgentService
             }
             catch (Exception exception)
             {
-                SvcLogger.log($"Exception Error ({System.Reflection.MethodBase.GetCurrentMethod().Name}): {exception.Message + "\n" + exception.StackTrace}");
+                Console.WriteLine($"Exception Error ({System.Reflection.MethodBase.GetCurrentMethod().Name}): {exception.Message + "\n" + exception.StackTrace}");
             }
         }
 
@@ -43,7 +43,7 @@ namespace WinAgentService
             }
             catch (Exception exception)
             {
-                SvcLogger.log($"Exception Error ({System.Reflection.MethodBase.GetCurrentMethod().Name}): {exception.Message + "\n" + exception.StackTrace}");
+                Console.WriteLine($"Exception Error ({System.Reflection.MethodBase.GetCurrentMethod().Name}): {exception.Message + "\n" + exception.StackTrace}");
                 return default(T);
             }
         }
@@ -51,10 +51,7 @@ namespace WinAgentService
 
     public class UserSetting : AppSettings<UserSetting>
     {
-        // public string customer_id = "testagent1";
-        // public string activation_key = "activationkey1";
         public string api_base = "http://192.168.8.171:5000";
         public string api_activate = "/api/activate";
-        public string api_submit = "/api/submit";
     }
 }

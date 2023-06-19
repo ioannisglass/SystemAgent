@@ -51,7 +51,7 @@ namespace Helpers
             }
             catch(Exception ex) 
             {
-                SvcLogger.log($"Exception Error ({System.Reflection.MethodBase.GetCurrentMethod().Name}): {ex.Message + "\n" + ex.StackTrace}");
+                Console.WriteLine($"Exception Error ({System.Reflection.MethodBase.GetCurrentMethod().Name}): {ex.Message + "\n" + ex.StackTrace}");
             }
             return w_strResponse;
         }

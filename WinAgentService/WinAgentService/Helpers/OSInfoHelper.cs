@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualBasic.Devices;
+﻿using Helpers;
+using Microsoft.VisualBasic.Devices;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using WinAgent.BaseModel;
+using WinAgentService.BaseModel;
 
 namespace WinAgent.Helpers
 {
@@ -135,8 +136,12 @@ namespace WinAgent.Helpers
             IEnumerable<MInstalledApp> finalList = new List<MInstalledApp>();
             List<MInstalledApp> win32AppsCU = getThirdPartyApps(Registry.CurrentUser, registry_key_32);
             List<MInstalledApp> win64AppsCU = getThirdPartyApps(Registry.CurrentUser, registry_key_64);
-            
+            List<MInstalledApp> win32AppsLM = getThirdPartyApps(Registry.LocalMachine, registry_key_32);
+            List<MInstalledApp> win64AppsLM = getThirdPartyApps(Registry.LocalMachine, registry_key_64);
+
             finalList = win32AppsCU.Concat(win64AppsCU);
+            finalList = finalList.Concat(win32AppsLM);
+            finalList = finalList.Concat(win64AppsLM);
 
             finalList = finalList.GroupBy(d => d.displayName).Select(d => d.First());
 
@@ -145,29 +150,47 @@ namespace WinAgent.Helpers
 
         public static List<MInstalledApp> getThirdPartyApps(RegistryKey regKey, string registryKey)
         {
-            RegistryKey uninstallKey = regKey.OpenSubKey(registryKey);
             List<MInstalledApp> list = new List<MInstalledApp>();
-            if (uninstallKey != null)
+            try
             {
-                foreach (string subKeyName in uninstallKey.GetSubKeyNames())
+                RegistryKey uninstallKey = regKey.OpenSubKey(registryKey);
+                // Test Log
+                SvcLogger.log(uninstallKey.ToString());
+                if (uninstallKey != null)
                 {
-                    RegistryKey subKey = uninstallKey.OpenSubKey(subKeyName);
-                    string displayName = subKey.GetValue("DisplayName") as string;
-                    string displayVersion = subKey.GetValue("DisplayVersion") as string;
-                    string publisher = subKey.GetValue("Publisher") as string;
-                    bool isSystemComponent = Convert.ToBoolean(subKey.GetValue("SystemComponent", 0));
-
-                    if (!string.IsNullOrEmpty(displayName) && !isSystemComponent && !IsMicrosoftStoreApp(publisher))
+                    foreach (string subKeyName in uninstallKey.GetSubKeyNames())
                     {
-                        list.Add(new MInstalledApp()
+                        try
                         {
-                            displayName = displayName.Trim(),
-                            installationLocation = "",
-                            displayVersion = displayVersion ?? "Unknown",
-                            publisher = publisher ?? "Unknown"
-                        });
+                            RegistryKey subKey = uninstallKey.OpenSubKey(subKeyName);
+                            string displayName = subKey.GetValue("DisplayName") as string;
+                            string displayVersion = subKey.GetValue("DisplayVersion") as string;
+                            string publisher = subKey.GetValue("Publisher") as string;
+                            bool isSystemComponent = Convert.ToBoolean(subKey.GetValue("SystemComponent", 0));
+                            // Test Log
+                            SvcLogger.log($"{displayName}:{displayVersion}:{publisher}");
+
+                            if (!string.IsNullOrEmpty(displayName) && !isSystemComponent && !IsMicrosoftStoreApp(publisher))
+                            {
+                                list.Add(new MInstalledApp()
+                                {
+                                    displayName = displayName.Trim(),
+                                    installationLocation = "",
+                                    displayVersion = displayVersion ?? "Unknown",
+                                    publisher = publisher ?? "Unknown"
+                                });
+                            }
+                        }
+                        catch(Exception ex)
+                        {
+                            SvcLogger.log(ex.Message);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                SvcLogger.log(ex.Message);
             }
             return list;
         }

@@ -39,7 +39,7 @@
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.Description = "Scan Process";
+            this.serviceInstaller1.Description = "Windows Agent";
             this.serviceInstaller1.DisplayName = "WinAgentService";
             this.serviceInstaller1.ServiceName = "WinAgentService";
             // 
