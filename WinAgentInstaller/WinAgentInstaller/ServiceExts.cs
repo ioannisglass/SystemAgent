@@ -10,7 +10,7 @@ namespace WinAgentInstaller
 {
     public static class ServiceExts
     {
-        public static void StartService(string[] args, string serviceName = "WinAgentService", int timeoutMilliseconds = 1000)
+        public static void StartService(string[] args, string serviceName = "WinAgentSvc", int timeoutMilliseconds = 1000)
         {
             ServiceController service = new ServiceController(serviceName);
             try
@@ -26,7 +26,7 @@ namespace WinAgentInstaller
             }
         }
 
-        public static void StopService(string serviceName = "WinAgentService", int timeoutMilliseconds = 3000)
+        public static void StopService(string serviceName = "WinAgentSvc", int timeoutMilliseconds = 3000)
         {
             ServiceController service = new ServiceController(serviceName);
             try
@@ -42,7 +42,7 @@ namespace WinAgentInstaller
             }
         }
 
-        public static void RestartService(string serviceName = "WinAgentService", int timeoutMilliseconds = 3000)
+        public static void RestartService(string serviceName = "WinAgentSvc", int timeoutMilliseconds = 3000)
         {
             ServiceController service = new ServiceController(serviceName);
             try
@@ -88,12 +88,12 @@ namespace WinAgentInstaller
             ProcessExts.executeCommand(cmd, out err_msg);
         }
 
-        public static bool IsServiceInstalled(string service_name = "WinAgentService")
+        public static bool IsServiceInstalled(string service_name = "WinAgentSvc")
         {
             return ServiceController.GetServices().Any(s => s.ServiceName == service_name);
         }
 
-        public static string GetWindowsServiceStatus(string SERVICENAME = "WinAgentService")
+        public static string GetWindowsServiceStatus(string SERVICENAME = "WinAgentSvc")
         {
             ServiceController sc = new ServiceController(SERVICENAME);
 

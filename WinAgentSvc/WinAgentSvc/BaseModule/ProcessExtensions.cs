@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace WinAgentService
+namespace WinAgentSvc.BaseModule
 {
     public static class ProcessExtensions
     {

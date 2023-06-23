@@ -55,7 +55,7 @@ namespace WinAgent
             w_mAgentData.osInfo = OSInfoHelper.getOSFullName() + $" {OSInfoHelper.getOSbit()} ({OSInfoHelper.getOSDescription()})";
             w_mAgentData.version = OSInfoHelper.getOSVersion();
             w_mAgentData.machineName = OSInfoHelper.getMachineName();
-            w_mAgentData.auth.cusid = Program.g_setting.customer_id;
+            w_mAgentData.auth.customerid = Program.g_setting.customer_id;
             w_mAgentData.auth.actkey = Program.g_setting.activation_key;
 
             w_mAgentData.installedApps.AddRange(OSInfoHelper.getFullThirdPartyApps());

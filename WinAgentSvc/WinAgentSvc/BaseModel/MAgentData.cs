@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WinAgentService.BaseModel
+namespace WinAgentSvc.BaseModel
 {
     [Serializable]
     public class MAgentData

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WinAgentService.BaseModule
+namespace WinAgentSvc.BaseModule
 {
     public class ProcessInfo
     {

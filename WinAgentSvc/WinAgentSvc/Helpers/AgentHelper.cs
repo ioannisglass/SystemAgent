@@ -1,20 +1,19 @@
-﻿using Helpers;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
-using WinAgentService.BaseModel;
+using WinAgentSvc.BaseModel;
 
-namespace WinAgentService.Helpers
+namespace WinAgentSvc.Helpers
 {
     public static class AgentHelper
     {
         public static int checkActivated(string _strCustomerID, string _strActivationKey)
         {
-            string w_strURL = Program.g_setting.api_base + Program.g_setting.api_activate;
+            // string w_strURL = Program.g_setting.api_base + Program.g_setting.api_activate;
+            string w_strURL = ConstEnv.API_BASE_URL + ConstEnv.API_AUTH_URL;
             int w_nRet = ConstEnv.API_SERVER_ERROR;
             MAuth w_mAuth = new MAuth(_strCustomerID, _strActivationKey);
             // string w_strPostData = $"cusid={_strCustomerID}&actkey={_strActivationKey}";
@@ -30,7 +29,8 @@ namespace WinAgentService.Helpers
 
         public static string postAgentData(MAgentData _mAgentData)
         {
-            string w_strURL = Program.g_setting.api_base + Program.g_setting.api_submit;
+            // string w_strURL = Program.g_setting.api_base + Program.g_setting.api_submit;
+            string w_strURL = ConstEnv.API_BASE_URL + ConstEnv.API_SUBMIT_URL;
             // int w_nRet = 0;
             string w_strPostData = JsonConvert.SerializeObject(_mAgentData, Formatting.Indented);
             string w_strResponse = WebReqHelper.postData(w_strPostData, w_strURL, "application/json");

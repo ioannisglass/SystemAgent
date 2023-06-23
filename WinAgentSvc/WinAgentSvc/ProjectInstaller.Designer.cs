@@ -1,4 +1,4 @@
-﻿namespace WinAgentService
+﻿namespace WinAgentSvc
 {
     partial class ProjectInstaller
     {
@@ -40,8 +40,8 @@
             // serviceInstaller1
             // 
             this.serviceInstaller1.Description = "Windows Agent";
-            this.serviceInstaller1.DisplayName = "WinAgentService";
-            this.serviceInstaller1.ServiceName = "WinAgentService";
+            this.serviceInstaller1.DisplayName = "WinAgentSvc";
+            this.serviceInstaller1.ServiceName = "WinAgentSvc";
             // 
             // ProjectInstaller
             // 

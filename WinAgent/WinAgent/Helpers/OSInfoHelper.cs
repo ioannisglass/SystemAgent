@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WinAgent.BaseModel;
 
@@ -165,6 +166,17 @@ namespace WinAgent.Helpers
 
                         if (!string.IsNullOrEmpty(displayName) && !isSystemComponent && !IsMicrosoftStoreApp(publisher))
                         {
+                            displayName = Regex.Replace(displayName, @"[^\u0000-\u007F]+", string.Empty);
+                            displayVersion = Regex.Replace(displayVersion, @"[^\u0000-\u007F]+", string.Empty);
+                            char[] separators = { '\0', '\a', '\b', '\t', '\n', '\v', '\f', '\r' };
+                            // string pattern = @"\|(?=[a-z0-9])";
+                            // displayName = Regex.Split(displayName, pattern)[0];
+                            // displayVersion = Regex.Split(displayVersion, pattern)[0];
+                            
+                            string[] temp = displayName.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+                            displayName = displayName.Split(separators, StringSplitOptions.RemoveEmptyEntries)[0];
+                            displayVersion = displayVersion.Split(separators, StringSplitOptions.RemoveEmptyEntries)[0];
+
                             list.Add(new MInstalledApp()
                             {
                                 displayName = displayName.Trim(),

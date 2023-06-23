@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Diagnostics;
-using System.Drawing;
-using System.IO;
 
-namespace WinAgentService
+namespace WinAgentSvc.BaseModule
 {
     public class ProcessExts
     {
@@ -28,38 +27,12 @@ namespace WinAgentService
                     if (runningProc.MainModule.FileName == _proc_name)
                         return true;
                 }
-                catch(Exception exception)
+                catch (Exception exception)
                 {
                     Console.WriteLine(exception.Message);
                 }
             }
             return false;
-        }
-
-        public void RunAlert(string msg)
-        {
-            string path = System.Environment
-                .GetEnvironmentVariable("SCAN_HOME", EnvironmentVariableTarget.Machine);
-
-            System.Threading.Thread.Sleep(1000);
-            string msgbx_path = Path.Combine(path, "AlertStatus.exe");
-
-            msg = $"\"{msg}\"";
-
-            ProcessExtensions.StartProcessAsCurrentUser(msgbx_path, msg);
-        }
-
-        public void RunNotePad(string text)
-        {
-            System.Threading.Thread.Sleep(1000);
-
-            string path = System.Environment
-                .GetEnvironmentVariable("SCAN_HOME", EnvironmentVariableTarget.Machine);
-            path = Path.Combine(path, "temp.txt");
-
-            File.WriteAllText(path, text);
-            path = $"\"{path}\"";
-            ProcessExtensions.StartProcessAsCurrentUser("notepad.exe", $"{path} {path}");
         }
 
         public void RunCmdFlag(string proc_path)

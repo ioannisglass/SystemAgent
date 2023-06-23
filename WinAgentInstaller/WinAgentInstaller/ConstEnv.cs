@@ -14,5 +14,8 @@ namespace WinAgentInstaller
         public static readonly int AGENT_NO_REGISTERED = 0;
         public static readonly int AGENT_NO_ACTIVATED = 1;
         public static readonly int AGENT_REGISTERED = 2;
+
+        public static readonly string API_BASE = "https://api.vulnagent.com";
+        public static readonly string API_ACTIVATE = "/api/activate";
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace WinAgentService
+﻿namespace WinAgentSvc
 {
     partial class Service1
     {
@@ -31,7 +31,7 @@
             // 
             // Service1
             // 
-            this.ServiceName = "WinAgentService";
+            this.ServiceName = "WinAgentSvc";
 
         }
 

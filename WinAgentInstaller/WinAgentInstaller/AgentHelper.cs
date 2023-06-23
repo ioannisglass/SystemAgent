@@ -13,7 +13,8 @@ namespace WinAgentInstaller
     {
         public static int checkActivated(string _strCustomerID, string _strActivationKey)
         {
-            string w_strURL = Program.g_setting.api_base + Program.g_setting.api_activate;
+            // string w_strURL = Program.g_setting.api_base + Program.g_setting.api_activate;
+            string w_strURL = ConstEnv.API_BASE + ConstEnv.API_ACTIVATE;
             int w_nRet = ConstEnv.API_SERVER_ERROR;
             MAuth w_mAuth = new MAuth(_strCustomerID, _strActivationKey);
             // string w_strPostData = $"cusid={_strCustomerID}&actkey={_strActivationKey}";

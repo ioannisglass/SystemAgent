@@ -1,12 +1,14 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Net;
+using System.Linq;
 using System.Net.Security;
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace Helpers
+namespace WinAgentSvc.Helpers
 {
     public static class WebReqHelper
     {
@@ -49,7 +51,7 @@ namespace Helpers
                     w_strResponse = reader.ReadToEnd();
                 }
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 SvcLogger.log($"Exception Error ({System.Reflection.MethodBase.GetCurrentMethod().Name}): {ex.Message + "\n" + ex.StackTrace}");
             }

@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using Microsoft.Win32;
+using System.Security.Permissions;
+using System.Security;
 
 namespace WinAgentInstaller
 {
@@ -130,6 +132,68 @@ namespace WinAgentInstaller
             {
                 Console.WriteLine(e.Message);
                 //error, do something
+            }
+        }
+
+        public static void unblockFile(string filePath)
+        {
+            // Create a FileIOPermission to modify the file's security attributes
+            FileIOPermission filePermission = new FileIOPermission(FileIOPermissionAccess.Write, filePath);
+
+            try
+            {
+                // Check if the current security context has the required permission
+                filePermission.Demand();
+
+                // Open the file and set the Unblock flag using the alternate data stream
+                using (FileStream fileStream = File.Open(filePath, FileMode.Open, FileAccess.Write))
+                {
+                    fileStream.WriteByte(0);
+                }
+            }
+            catch (SecurityException)
+            {
+                // Handle the exception if the required permission is not available
+                // or if the file is in a restricted location
+                // (e.g., system directories, read-only locations)
+                Console.WriteLine("Access denied. Unable to unblock the file.");
+            }
+        }
+
+        public static void unblockFileByShell(string filePath)
+        {
+            string powershellCommand = $"Unblock-File -Path '{filePath}'";
+            string escapedCommand = $"-ExecutionPolicy Bypass -Command \"{powershellCommand}\"";
+
+            ProcessStartInfo processStartInfo = new ProcessStartInfo();
+            processStartInfo.FileName = "powershell.exe";
+            processStartInfo.Arguments = escapedCommand;
+            processStartInfo.UseShellExecute = false;
+            processStartInfo.RedirectStandardOutput = true;
+
+            using (Process process = new Process())
+            {
+                process.StartInfo = processStartInfo;
+                process.Start();
+
+                // Read the output of the PowerShell command
+                string output = process.StandardOutput.ReadToEnd();
+
+                process.WaitForExit();
+
+                // Check the exit code to determine if the command executed successfully
+                int exitCode = process.ExitCode;
+                if (exitCode == 0)
+                {
+                    Console.WriteLine("File unblocked successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("Failed to unblock file.");
+                }
+
+                Console.WriteLine("PowerShell Output:");
+                Console.WriteLine(output);
             }
         }
     }

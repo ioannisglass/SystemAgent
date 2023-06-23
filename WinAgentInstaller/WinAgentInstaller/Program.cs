@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Permissions;
 using System.Text;
@@ -15,7 +16,6 @@ namespace WinAgentInstaller
         public static string strAgentPath = string.Empty;
         public static string g_strCustomerID = string.Empty;
         public static string g_strActivationKey = string.Empty;
-        public static UserSetting g_setting = new UserSetting();
         static void Main(string[] args)
         {
             if (args.Length != 2)
@@ -27,31 +27,41 @@ namespace WinAgentInstaller
             g_strCustomerID = args[0];
             g_strActivationKey = args[1];
             
-            g_setting = UserSetting.Load();
-            if (g_setting == null)
-            {
-                g_setting = new UserSetting();
-                g_setting.Save();
-            }
+            // g_setting = UserSetting.Load();
+            // if (g_setting == null)
+            // {
+            //     g_setting = new UserSetting();
+            //     g_setting.Save();
+            // }
 
             int w_nRet = AgentHelper.checkActivated(g_strCustomerID, g_strActivationKey);
             if (w_nRet == ConstEnv.AGENT_REGISTERED)
                 Console.WriteLine("Customer is Activated.");
-            else if (w_nRet == ConstEnv.AGENT_NO_ACTIVATED)
-            {
-                Console.WriteLine("Customer not Activated.");
-                Environment.Exit(0);
-            }
-            else if (w_nRet == ConstEnv.AGENT_NO_REGISTERED)
-            {
-                Console.WriteLine("No Registered Customer.");
-                Environment.Exit(0);
-            }
-            else
+            else if (w_nRet == ConstEnv.API_SERVER_ERROR)
             {
                 Console.WriteLine("Server No Response.");
                 Environment.Exit(0);
             }
+            else
+            {
+                Console.WriteLine("Activation Failed");
+                Environment.Exit(0);
+            }
+            // else if (w_nRet == ConstEnv.AGENT_NO_ACTIVATED)
+            // {
+            //     Console.WriteLine("Customer not Activated.");
+            //     Environment.Exit(0);
+            // }
+            // else if (w_nRet == ConstEnv.AGENT_NO_REGISTERED)
+            // {
+            //     Console.WriteLine("No Registered Customer.");
+            //     Environment.Exit(0);
+            // }
+            // else
+            // {
+            //     Console.WriteLine("Server No Response.");
+            //     Environment.Exit(0);
+            // }
 
             strAgentPath = System.Environment
                 .GetEnvironmentVariable(varAgentEnv, EnvironmentVariableTarget.Machine);
@@ -64,7 +74,9 @@ namespace WinAgentInstaller
                     EnvironmentVariableTarget.Machine);
             }
 
-            ServiceExts.InstallService("WinAgentService.exe");
+            string w_strSvcFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WinAgentSvc.exe");
+            ProcessExts.unblockFileByShell(w_strSvcFullPath);
+            ServiceExts.InstallService("WinAgentSvc.exe");
 
             int w_nRetryNum = 0;
             while (true)

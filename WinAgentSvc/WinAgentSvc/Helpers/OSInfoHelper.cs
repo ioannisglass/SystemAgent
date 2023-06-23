@@ -1,15 +1,16 @@
-﻿using Helpers;
-using Microsoft.VisualBasic.Devices;
+﻿using Microsoft.VisualBasic.Devices;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using WinAgentService.BaseModel;
+using WinAgentSvc.BaseModel;
 
-namespace WinAgent.Helpers
+namespace WinAgentSvc.Helpers
 {
     public static class OSInfoHelper
     {
@@ -98,7 +99,7 @@ namespace WinAgent.Helpers
                                 list.Add(new MInstalledApp()
                                 {
                                     displayName = displayName.Trim(),
-                                    installationLocation = installLocation,
+                                    // installationLocation = installLocation,
                                     displayVersion = version
                                 });
                             }
@@ -151,46 +152,42 @@ namespace WinAgent.Helpers
         public static List<MInstalledApp> getThirdPartyApps(RegistryKey regKey, string registryKey)
         {
             List<MInstalledApp> list = new List<MInstalledApp>();
-            try
+            RegistryKey uninstallKey = regKey.OpenSubKey(registryKey);
+            if (uninstallKey != null)
             {
-                RegistryKey uninstallKey = regKey.OpenSubKey(registryKey);
-                // Test Log
-                SvcLogger.log(uninstallKey.ToString());
-                if (uninstallKey != null)
+                foreach (string subKeyName in uninstallKey.GetSubKeyNames())
                 {
-                    foreach (string subKeyName in uninstallKey.GetSubKeyNames())
+                    try
                     {
-                        try
-                        {
-                            RegistryKey subKey = uninstallKey.OpenSubKey(subKeyName);
-                            string displayName = subKey.GetValue("DisplayName") as string;
-                            string displayVersion = subKey.GetValue("DisplayVersion") as string;
-                            string publisher = subKey.GetValue("Publisher") as string;
-                            bool isSystemComponent = Convert.ToBoolean(subKey.GetValue("SystemComponent", 0));
-                            // Test Log
-                            SvcLogger.log($"{displayName}:{displayVersion}:{publisher}");
+                        RegistryKey subKey = uninstallKey.OpenSubKey(subKeyName);
+                        string displayName = subKey.GetValue("DisplayName") as string;
+                        string displayVersion = subKey.GetValue("DisplayVersion") as string;
+                        string publisher = subKey.GetValue("Publisher") as string;
+                        bool isSystemComponent = Convert.ToBoolean(subKey.GetValue("SystemComponent", 0));
 
-                            if (!string.IsNullOrEmpty(displayName) && !isSystemComponent && !IsMicrosoftStoreApp(publisher))
-                            {
-                                list.Add(new MInstalledApp()
-                                {
-                                    displayName = displayName.Trim(),
-                                    installationLocation = "",
-                                    displayVersion = displayVersion ?? "Unknown",
-                                    publisher = publisher ?? "Unknown"
-                                });
-                            }
-                        }
-                        catch(Exception ex)
+                        if (!string.IsNullOrEmpty(displayName) && !isSystemComponent && !IsMicrosoftStoreApp(publisher))
                         {
-                            SvcLogger.log(ex.Message);
+                            displayName = Regex.Replace(displayName, @"[^\u0000-\u007F]+", string.Empty);
+                            displayVersion = Regex.Replace(displayVersion, @"[^\u0000-\u007F]+", string.Empty);
+
+                            char[] separators = { '\0', '\a', '\b', '\t', '\n', '\v', '\f', '\r' };
+                            displayName = displayName.Split(separators, StringSplitOptions.RemoveEmptyEntries)[0];
+                            displayVersion = displayVersion.Split(separators, StringSplitOptions.RemoveEmptyEntries)[0];
+
+                            list.Add(new MInstalledApp()
+                            {
+                                displayName = displayName.Trim(),
+                                // installationLocation = "",
+                                displayVersion = displayVersion ?? "Unknown"
+                                // publisher = publisher ?? "Unknown"
+                            });
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        SvcLogger.log(ex.Message);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                SvcLogger.log(ex.Message);
             }
             return list;
         }
