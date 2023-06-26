@@ -42,7 +42,15 @@ namespace WinAgentSvc
             DateTime newDT = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, targetZone);
             SvcLogger.log(newDT.ToString());
             if (newDT.Hour == 17)
-                submitData();
+            {
+                int w_nRet = AgentHelper.checkActivated(Program.g_strCusID, Program.g_strActkey);
+                if (w_nRet == ConstEnv.AGENT_REGISTERED)
+                    submitData();
+                else if (w_nRet == ConstEnv.API_SERVER_ERROR)
+                    Console.WriteLine("Server No Response.");
+                else
+                    Console.WriteLine("Activation Failed");
+            }
         }
 
         protected override void OnStop()
