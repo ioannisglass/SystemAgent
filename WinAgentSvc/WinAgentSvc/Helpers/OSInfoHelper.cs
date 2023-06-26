@@ -79,56 +79,6 @@ namespace WinAgentSvc.Helpers
          UninstallString ==> Determined and set by Windows Installer.
          SettingsIdentifier ==> MSIARPSETTINGSIDENTIFIER property
          */
-        private static List<MInstalledApp> GetInstalledApplication(RegistryKey regKey, string registryKey)
-        {
-            List<MInstalledApp> list = new List<MInstalledApp>();
-            using (Microsoft.Win32.RegistryKey key = regKey.OpenSubKey(registryKey))
-            {
-                if (key != null)
-                {
-                    foreach (string name in key.GetSubKeyNames())
-                    {
-                        using (RegistryKey subkey = key.OpenSubKey(name))
-                        {
-                            string displayName = (string)subkey.GetValue("DisplayName");
-                            string installLocation = (string)subkey.GetValue("InstallLocation");
-                            string version = (string)subkey.GetValue("DisplayVersion");
-
-                            if (!string.IsNullOrEmpty(displayName)) // && !string.IsNullOrEmpty(installLocation)
-                            {
-                                list.Add(new MInstalledApp()
-                                {
-                                    displayName = displayName.Trim(),
-                                    // installationLocation = installLocation,
-                                    displayVersion = version
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-
-            return list;
-        }
-
-        public static List<MInstalledApp> GetFullListInstalledApplication()
-        {
-            IEnumerable<MInstalledApp> finalList = new List<MInstalledApp>();
-
-            string registry_key_32 = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
-            string registry_key_64 = @"SOFTWARE\WoW6432Node\Microsoft\Windows\CurrentVersion\Uninstall";
-
-            List<MInstalledApp> win32AppsCU = GetInstalledApplication(Registry.CurrentUser, registry_key_32);
-            List<MInstalledApp> win32AppsLM = GetInstalledApplication(Registry.LocalMachine, registry_key_32);
-            List<MInstalledApp> win64AppsCU = GetInstalledApplication(Registry.CurrentUser, registry_key_64);
-            List<MInstalledApp> win64AppsLM = GetInstalledApplication(Registry.LocalMachine, registry_key_64);
-
-            finalList = win32AppsCU.Concat(win32AppsLM).Concat(win64AppsCU).Concat(win64AppsLM);
-
-            finalList = finalList.GroupBy(d => d.displayName).Select(d => d.First());
-
-            return finalList.OrderBy(o => o.displayName).ToList();
-        }
 
         public static List<MInstalledApp> getFullThirdPartyApps()
         {
@@ -143,6 +93,7 @@ namespace WinAgentSvc.Helpers
             finalList = win32AppsCU.Concat(win64AppsCU);
             finalList = finalList.Concat(win32AppsLM);
             finalList = finalList.Concat(win64AppsLM);
+            // finalList = win32AppsCU.Concat(win32AppsLM).Concat(win64AppsCU).Concat(win64AppsLM);
 
             finalList = finalList.GroupBy(d => d.displayName).Select(d => d.First());
 
@@ -162,6 +113,7 @@ namespace WinAgentSvc.Helpers
                         RegistryKey subKey = uninstallKey.OpenSubKey(subKeyName);
                         string displayName = subKey.GetValue("DisplayName") as string;
                         string displayVersion = subKey.GetValue("DisplayVersion") as string;
+                        // string installLocation = (string)subkey.GetValue("InstallLocation");
                         string publisher = subKey.GetValue("Publisher") as string;
                         bool isSystemComponent = Convert.ToBoolean(subKey.GetValue("SystemComponent", 0));
 
