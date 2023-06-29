@@ -117,7 +117,8 @@ namespace WinAgentSvc.Helpers
                         string publisher = subKey.GetValue("Publisher") as string;
                         bool isSystemComponent = Convert.ToBoolean(subKey.GetValue("SystemComponent", 0));
 
-                        if (!string.IsNullOrEmpty(displayName) && !isSystemComponent && !IsMicrosoftStoreApp(publisher))
+                        // if (!string.IsNullOrEmpty(displayName) && !isSystemComponent && !IsMicrosoftStoreApp(publisher))
+                        if (!string.IsNullOrEmpty(displayName))
                         {
                             displayName = Regex.Replace(displayName, @"[^\u0000-\u007F]+", string.Empty);
                             displayVersion = Regex.Replace(displayVersion, @"[^\u0000-\u007F]+", string.Empty);
