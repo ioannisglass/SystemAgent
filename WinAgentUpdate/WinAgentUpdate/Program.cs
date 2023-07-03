@@ -16,7 +16,7 @@ namespace WinAgentUpdate
         private static string varAgentEnv = "AGENT_HOME";
         public static string strAgentPath = string.Empty;
         public static object g_objLock = new object();
-        public static string g_log_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "uninstall.log");
+        public static string g_log_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "update.log");
         static void Main(string[] args)
         {
             try
