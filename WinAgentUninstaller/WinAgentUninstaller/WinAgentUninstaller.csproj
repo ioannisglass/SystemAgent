@@ -90,14 +90,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgentHelper.cs" />
     <Compile Include="ConstEnv.cs" />
-    <Compile Include="MAuth.cs" />
+    <Compile Include="FileHelper.cs" />
     <Compile Include="ProcessExtensions.cs" />
     <Compile Include="ProcessExts.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceExts.cs" />
+    <Compile Include="SvcLogger.cs" />
     <Compile Include="WebReqHelper.cs" />
   </ItemGroup>
   <ItemGroup>

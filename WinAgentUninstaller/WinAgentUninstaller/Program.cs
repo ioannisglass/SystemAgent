@@ -14,81 +14,103 @@ namespace WinAgentUninstaller
         public static string g_strScanHome = string.Empty;
         private static string varAgentEnv = "AGENT_HOME";
         public static string strAgentPath = string.Empty;
+        public static object g_objLock = new object();
+        public static string g_log_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "uninstall.log");
         static void Main(string[] args)
         {
-            bool isAdmin = ProcessExts.isUserAnAdmin();
-
-            if (isAdmin)
+            try
             {
-                Console.WriteLine("Command Prompt is running as administrator.");
-            }
-            else
-            {
-                Console.WriteLine("Run Command Prompt as administrator.");
-                return;
-            }
+                bool isAdmin = ProcessExts.isUserAnAdmin();
 
-            strAgentPath = System.Environment
-                .GetEnvironmentVariable(varAgentEnv, EnvironmentVariableTarget.Machine);
-
-            if (strAgentPath == null || strAgentPath != AppDomain.CurrentDomain.BaseDirectory)
-            {
-                EnvironmentPermission permissions = new EnvironmentPermission(EnvironmentPermissionAccess.AllAccess, varAgentEnv);
-                permissions.Demand();
-                Environment.SetEnvironmentVariable(varAgentEnv, AppDomain.CurrentDomain.BaseDirectory,
-                    EnvironmentVariableTarget.Machine);
-            }
-
-            string w_strSvcFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WinAgentSvc.exe");
-
-            int w_nRetryNum = 0;
-            if (ServiceExts.IsServiceInstalled())
-            {
-                if (ServiceExts.GetWindowsServiceStatus() == "Running")
+                if (isAdmin)
+                    SvcLogger.log("Command Prompt is running as administrator.");
+                else
                 {
-                    Console.WriteLine("Service is running. Service will be stopped.");
-                    ServiceExts.StopService();
+                    SvcLogger.log("Run Command Prompt as administrator.");
+                    return;
                 }
-                ServiceExts.UninstallService("WinAgentSvc.exe");
 
-                while (true)
+                strAgentPath = System.Environment
+                    .GetEnvironmentVariable(varAgentEnv, EnvironmentVariableTarget.Machine);
+
+                if (strAgentPath == null || strAgentPath != AppDomain.CurrentDomain.BaseDirectory)
                 {
-                    if (ServiceExts.IsServiceInstalled())
+                    EnvironmentPermission permissions = new EnvironmentPermission(EnvironmentPermissionAccess.AllAccess, varAgentEnv);
+                    permissions.Demand();
+                    Environment.SetEnvironmentVariable(varAgentEnv, AppDomain.CurrentDomain.BaseDirectory,
+                        EnvironmentVariableTarget.Machine);
+                }
+
+                // string w_strSvcFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WinAgentSvc.exe");
+
+                int w_nRetryNum = 0;
+                if (ServiceExts.IsServiceInstalled())
+                {
+                    if (ServiceExts.GetWindowsServiceStatus() == "Running")
                     {
-                        if (w_nRetryNum >= 5)
+                        SvcLogger.log("Service is running. Service will be stopped.");
+                        ServiceExts.StopService();
+                    }
+                    ServiceExts.UninstallService("WinAgentSvc.exe");
+
+                    while (true)
+                    {
+                        if (ServiceExts.IsServiceInstalled())
                         {
-                            Console.WriteLine("Service can not be uninstalled.");
-                            return;
+                            if (w_nRetryNum >= 5)
+                            {
+                                SvcLogger.log("Service can not be uninstalled.");
+                                return;
+                            }
+                            else
+                            {
+                                w_nRetryNum++;
+                                Thread.Sleep(3000);
+                            }
                         }
                         else
                         {
+                            SvcLogger.log("Service is uninstalled successfully.");
+                            break;
+                        }
+                    }
+                }
+                else
+                    SvcLogger.log("Service is not installed.");
+
+                string w_strSelfName = FileHelper.getSelfName();
+                string[] w_strrFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory);
+                foreach(string w_strFile in  w_strrFiles)
+                {
+                    w_nRetryNum = 0;
+                    string w_strFileName = Path.GetFileName(w_strFile);
+                    while (true)
+                    {
+                        try
+                        {
+                            if (w_strFileName != w_strSelfName)
+                                File.Delete(w_strFile);
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            SvcLogger.log(ex.Message);
                             w_nRetryNum++;
+                            if (w_nRetryNum >= 5)
+                            {
+                                SvcLogger.log($"{w_strFileName} can not be removed.");
+                                break;
+                            }
                             Thread.Sleep(3000);
                         }
                     }
-                    else
-                        break;
                 }
+                FileHelper.deleteSelf();
             }
-            else
-                Console.WriteLine("Service is not installed.");
-            Console.WriteLine("Service is uninstalled successfully.");
-
-            // Check if the WinAgentSvc.exe is existed. If yes, remove it.
-            if (File.Exists(w_strSvcFullPath))
+            catch(Exception e)
             {
-                try
-                {
-                    File.Delete(w_strSvcFullPath);
-                    Console.WriteLine("WinAgnetSvc.exe removed.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"WinAgnetSvc.exe can not be removed. Error({ex.Message})");
-                }
+                SvcLogger.log(e.Message);
             }
-            else
-                Console.WriteLine("No WinAgnetSvc.exe.");
         }
     }
 }
