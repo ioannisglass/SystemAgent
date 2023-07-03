@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using WinAgentSvc.BaseModel;
@@ -35,6 +36,16 @@ namespace WinAgentSvc.Helpers
             string w_strPostData = JsonConvert.SerializeObject(_mAgentData, Formatting.Indented);
             string w_strResponse = WebReqHelper.postData(w_strPostData, w_strURL, "application/json");
             return w_strResponse;
+        }
+        public static bool isAgentNew()
+        {
+
+            return true;
+        }
+        public static void downloadSvc()
+        {
+            WebClient wc = new WebClient();
+            wc.DownloadFile(file_url, temp_path);
         }
     }
 }

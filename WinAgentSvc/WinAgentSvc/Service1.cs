@@ -41,6 +41,13 @@ namespace WinAgentSvc
         {
             DateTime newDT = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, targetZone);
             SvcLogger.log(newDT.ToString());
+
+            bool w_bAgentUpdated = AgentHelper.isAgentNew();
+            if (w_bAgentUpdated)
+            {
+
+            }
+
             if (newDT.Hour == 17)
             {
                 int w_nRet = AgentHelper.checkActivated(Program.g_strCusID, Program.g_strActkey);
