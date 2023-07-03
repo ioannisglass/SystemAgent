@@ -16,16 +16,18 @@ namespace WinAgentInstaller
         public static string strAgentPath = string.Empty;
         public static string g_strCustomerID = string.Empty;
         public static string g_strActivationKey = string.Empty;
+        public static object g_objLock = new object();
+        public static string g_log_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "install.log");
         static void Main(string[] args)
         {
-            if (args.Length != 2)
-            {
-                Console.WriteLine("No Customer ID and Activation Key.");
-                return;
-            }
+            // if (args.Length != 2)
+            // {
+            //     SvcLogger.log("No Customer ID and Activation Key.");
+            //     return;
+            // }
             // string[] args = Environment.GetCommandLineArgs();
-            g_strCustomerID = args[0];
-            g_strActivationKey = args[1];
+            // g_strCustomerID = args[0];
+            // g_strActivationKey = args[1];
             
             // g_setting = UserSetting.Load();
             // if (g_setting == null)
@@ -34,17 +36,33 @@ namespace WinAgentInstaller
             //     g_setting.Save();
             // }
 
+            if (!File.Exists("key.ini"))
+            {
+                SvcLogger.log("No key file.");
+                return;
+            }
+            try
+            {
+                string[] w_strrLines = File.ReadAllLines("key.ini");
+                g_strCustomerID = w_strrLines[0];
+                g_strActivationKey = w_strrLines[1];
+            }
+            catch (Exception ex)
+            {
+                SvcLogger.log(ex.Message);
+            }
+
             int w_nRet = AgentHelper.checkActivated(g_strCustomerID, g_strActivationKey);
             if (w_nRet == ConstEnv.AGENT_REGISTERED)
-                Console.WriteLine("Customer is Activated.");
+                SvcLogger.log("Customer is Activated.");
             else if (w_nRet == ConstEnv.API_SERVER_ERROR)
             {
-                Console.WriteLine("Server No Response.");
+                SvcLogger.log("Server No Response.");
                 Environment.Exit(0);
             }
             else
             {
-                Console.WriteLine("Activation Failed");
+                SvcLogger.log("Activation Failed");
                 Environment.Exit(0);
             }
             // else if (w_nRet == ConstEnv.AGENT_NO_ACTIVATED)
@@ -85,7 +103,7 @@ namespace WinAgentInstaller
                 {
                     if (w_nRetryNum >= 5)
                     {
-                        Console.WriteLine("Service is not installed.");
+                        SvcLogger.log("Service is not installed.");
                         return;
                     }
                     else
@@ -100,10 +118,9 @@ namespace WinAgentInstaller
 
             if (ServiceExts.GetWindowsServiceStatus() == "Running")
             {
-                Console.WriteLine("Service is running already.");
+                SvcLogger.log("Service is running already.");
                 return;
             }
-
             ServiceExts.StartService(args);
         }
     }
