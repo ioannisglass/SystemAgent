@@ -4,10 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WinAgent.BaseModel;
+using Windows.Management.Deployment;
 
 namespace WinAgent.Helpers
 {
@@ -78,57 +80,6 @@ namespace WinAgent.Helpers
          UninstallString ==> Determined and set by Windows Installer.
          SettingsIdentifier ==> MSIARPSETTINGSIDENTIFIER property
          */
-        private static List<MInstalledApp> GetInstalledApplication(RegistryKey regKey, string registryKey)
-        {
-            List<MInstalledApp> list = new List<MInstalledApp>();
-            using (Microsoft.Win32.RegistryKey key = regKey.OpenSubKey(registryKey))
-            {
-                if (key != null)
-                {
-                    foreach (string name in key.GetSubKeyNames())
-                    {
-                        using (RegistryKey subkey = key.OpenSubKey(name))
-                        {
-                            string displayName = (string)subkey.GetValue("DisplayName");
-                            string installLocation = (string)subkey.GetValue("InstallLocation");
-                            string version = (string)subkey.GetValue("DisplayVersion");
-
-                            if (!string.IsNullOrEmpty(displayName)) // && !string.IsNullOrEmpty(installLocation)
-                            {
-                                list.Add(new MInstalledApp()
-                                {
-                                    displayName = displayName.Trim(),
-                                    installationLocation = installLocation,
-                                    displayVersion = version
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-
-            return list;
-        }
-
-        public static List<MInstalledApp> GetFullListInstalledApplication()
-        {
-            IEnumerable<MInstalledApp> finalList = new List<MInstalledApp>();
-
-            string registry_key_32 = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
-            string registry_key_64 = @"SOFTWARE\WoW6432Node\Microsoft\Windows\CurrentVersion\Uninstall";
-
-            List<MInstalledApp> win32AppsCU = GetInstalledApplication(Registry.CurrentUser, registry_key_32);
-            List<MInstalledApp> win32AppsLM = GetInstalledApplication(Registry.LocalMachine, registry_key_32);
-            List<MInstalledApp> win64AppsCU = GetInstalledApplication(Registry.CurrentUser, registry_key_64);
-            List<MInstalledApp> win64AppsLM = GetInstalledApplication(Registry.LocalMachine, registry_key_64);
-
-            finalList = win32AppsCU.Concat(win32AppsLM).Concat(win64AppsCU).Concat(win64AppsLM);
-
-            finalList = finalList.GroupBy(d => d.displayName).Select(d => d.First());
-
-            return finalList.OrderBy(o => o.displayName).ToList();
-        }
-
         public static List<MInstalledApp> getFullThirdPartyApps()
         {
             string registry_key_32 = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
@@ -138,10 +89,13 @@ namespace WinAgent.Helpers
             List<MInstalledApp> win64AppsCU = getThirdPartyApps(Registry.CurrentUser, registry_key_64);
             List<MInstalledApp> win32AppsLM = getThirdPartyApps(Registry.LocalMachine, registry_key_32);
             List<MInstalledApp> win64AppsLM = getThirdPartyApps(Registry.LocalMachine, registry_key_64);
+            List<MInstalledApp> uwpApps = getUWPApps();
 
-            finalList = win32AppsCU.Concat(win64AppsCU);
-            finalList = finalList.Concat(win32AppsLM);
-            finalList = finalList.Concat(win64AppsLM);
+            // finalList = win32AppsCU.Concat(win64AppsCU);
+            // finalList = finalList.Concat(win32AppsLM);
+            // finalList = finalList.Concat(win64AppsLM);
+
+            finalList = win32AppsCU.Concat(win32AppsLM).Concat(win64AppsCU).Concat(win64AppsLM).Concat(uwpApps);
 
             finalList = finalList.GroupBy(d => d.displayName).Select(d => d.First());
 
@@ -164,7 +118,8 @@ namespace WinAgent.Helpers
                         string publisher = subKey.GetValue("Publisher") as string;
                         bool isSystemComponent = Convert.ToBoolean(subKey.GetValue("SystemComponent", 0));
 
-                        if (!string.IsNullOrEmpty(displayName) && !isSystemComponent && !IsMicrosoftStoreApp(publisher))
+                        // if (!string.IsNullOrEmpty(displayName) && !isSystemComponent && !IsMicrosoftStoreApp(publisher))
+                        if (!string.IsNullOrEmpty(displayName) && !isSystemComponent && !isMSStoreAppWithName(displayName))
                         {
                             displayName = Regex.Replace(displayName, @"[^\u0000-\u007F]+", string.Empty);
                             displayVersion = Regex.Replace(displayVersion, @"[^\u0000-\u007F]+", string.Empty);
@@ -194,11 +149,57 @@ namespace WinAgent.Helpers
             }
             return list;
         }
+        public static List<MInstalledApp> getUWPApps()
+        {
+            List<MInstalledApp> list = new List<MInstalledApp>();
+            PackageManager packageManager = new PackageManager();
+            IEnumerable<Windows.ApplicationModel.Package> packages = packageManager.FindPackages();
+            int nCpt = 0;
+            foreach (var package in packages)
+            {
+                try
+                {
+                    string sInstalledLocation = package.InstalledLocation.Path;
+                    string sSignatureKind = package.SignatureKind.ToString();
+                    if (sInstalledLocation.Contains("WindowsApps") && sSignatureKind == "Store" && package.IsFramework == false)
+                    {
+                        // Console.WriteLine("Package n°{0}", nCpt);
+                        //Console.WriteLine("\tId Name {0}", package.Id.Name);
+                        Console.WriteLine("\tDisplay Name : {0}", package.DisplayName);
+                        Console.WriteLine("\tFamily : {0}", package.Id.FamilyName);
+                        // Console.WriteLine("\tLogo : {0}", package.Logo.ToString());
+                        string w_strDisplayName = package.DisplayName.Trim();
+                        
+                        string w_strVersion = $"{package.Id.Version.Major}.{package.Id.Version.Minor}.{package.Id.Version.Build}.{package.Id.Version.Revision}";
+                        string w_strPublisher = package.PublisherDisplayName;
 
+                        list.Add(new MInstalledApp()
+                        {
+                            displayName = w_strDisplayName,
+                            installationLocation = "",
+                            displayVersion = w_strVersion ?? "Unknown",
+                            publisher = w_strPublisher ?? "Unknown"
+                        });
+
+
+                        nCpt += 1;
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                }
+            }
+            return list;
+        }
         static bool IsMicrosoftStoreApp(string publisher)
         {
             // Add any specific criteria to identify Microsoft Store apps
             return publisher?.Contains("Microsoft Corporation") ?? false;
+        }
+
+        static bool isMSStoreAppWithName(string _strDisplayName)
+        {
+            return _strDisplayName?.StartsWith("Microsoft.") ?? false;
         }
     }
 }
