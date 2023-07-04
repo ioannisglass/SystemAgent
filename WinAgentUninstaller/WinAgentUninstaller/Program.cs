@@ -88,16 +88,16 @@ namespace WinAgentUninstaller
                     {
                         try
                         {
-                            if (w_strFileName != w_strSelfName)
+                            if (w_strFileName != w_strSelfName && w_strFileName != "Start.exe")
                                 File.Delete(w_strFile);
                             break;
                         }
                         catch (Exception ex)
                         {
-                            SvcLogger.log(ex.Message);
                             w_nRetryNum++;
                             if (w_nRetryNum >= 5)
                             {
+                                SvcLogger.log(ex.Message);
                                 SvcLogger.log($"{w_strFileName} can not be removed.");
                                 break;
                             }
