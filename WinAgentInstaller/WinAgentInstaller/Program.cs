@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Permissions;
@@ -58,28 +59,14 @@ namespace WinAgentInstaller
             else if (w_nRet == ConstEnv.API_SERVER_ERROR)
             {
                 SvcLogger.log("Server No Response.");
-                Environment.Exit(0);
+                return;
             }
             else
             {
-                SvcLogger.log("Activation Failed");
-                Environment.Exit(0);
+                SvcLogger.log("Activation Failed. This will be uninstalled.");
+                Process.Start("WinAgentUninstaller.exe");
+                return;
             }
-            // else if (w_nRet == ConstEnv.AGENT_NO_ACTIVATED)
-            // {
-            //     Console.WriteLine("Customer not Activated.");
-            //     Environment.Exit(0);
-            // }
-            // else if (w_nRet == ConstEnv.AGENT_NO_REGISTERED)
-            // {
-            //     Console.WriteLine("No Registered Customer.");
-            //     Environment.Exit(0);
-            // }
-            // else
-            // {
-            //     Console.WriteLine("Server No Response.");
-            //     Environment.Exit(0);
-            // }
 
             strAgentPath = System.Environment
                 .GetEnvironmentVariable(varAgentEnv, EnvironmentVariableTarget.Machine);
@@ -121,7 +108,7 @@ namespace WinAgentInstaller
                 SvcLogger.log("Service is running already.");
                 return;
             }
-            ServiceExts.StartService(args);
+            ServiceExts.StartService(new string[] { g_strCustomerID, g_strActivationKey });
         }
     }
 }
