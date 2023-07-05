@@ -30,9 +30,7 @@ namespace WinAgentUninstaller
             bool isAdmin = ProcessExts.isUserAnAdmin();
 
             if (isAdmin)
-            {
                 Console.WriteLine("Command Prompt is running as administrator.");
-            }
             else
             {
                 Console.WriteLine("Run Command Prompt as administrator.");
