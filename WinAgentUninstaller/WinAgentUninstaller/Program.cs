@@ -46,18 +46,17 @@ namespace WinAgentUninstaller
                 int w_nRetryNum = 0;
                 if (ServiceExts.IsServiceInstalled())
                 {
-                    if (ServiceExts.GetWindowsServiceStatus() == "Running")
-                    {
-                        SvcLogger.log("Service is running. Service will be stopped.");
-                        ServiceExts.StopService();
-                    }
+                    // if (ServiceExts.GetWindowsServiceStatus() == "Running")
+                    // {
+                    //     SvcLogger.log("Service is running. Service will be stopped.");
+                    //     ServiceExts.StopService();
+                    // }
                     ServiceExts.UninstallService("WinAgentSvc.exe");
-
                     while (true)
                     {
                         if (ServiceExts.IsServiceInstalled())
                         {
-                            if (w_nRetryNum >= 5)
+                            if (w_nRetryNum >= 10)
                             {
                                 SvcLogger.log("Service can not be uninstalled.");
                                 return;

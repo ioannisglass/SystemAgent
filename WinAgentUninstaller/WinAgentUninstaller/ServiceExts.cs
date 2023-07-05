@@ -79,11 +79,11 @@ namespace WinAgentUninstaller
 
         public static void UninstallService(string _strService)
         {
-            /*string cmd = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "InstallUtil.exe");
-            cmd += " -u " + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ScanService.exe");*/
+            string cmd = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "InstallUtil.exe");
+            cmd += " -u " + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _strService);
 
             // string cmd = "InstallUtil.exe -u ScanService.exe";
-            string cmd = $"InstallUtil.exe -u {_strService}";
+            // string cmd = $"InstallUtil.exe -u {_strService}";
             string err_msg = string.Empty;
             ProcessExts.executeCommand(cmd, out err_msg);
         }
