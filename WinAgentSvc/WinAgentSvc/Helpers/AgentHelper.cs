@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using WinAgentSvc.BaseModel;
@@ -37,15 +39,17 @@ namespace WinAgentSvc.Helpers
             string w_strResponse = WebReqHelper.postData(w_strPostData, w_strURL, "application/json");
             return w_strResponse;
         }
-        public static bool isAgentNew()
+        public static bool isAgentChanged()
         {
+            string w_strSvcFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WinAgentSvc.exe");
+            long w_lSvcSize = new FileInfo(w_strSvcFullPath).Length;
 
-            return true;
-        }
-        public static void downloadSvc()
-        {
-            WebClient wc = new WebClient();
-            wc.DownloadFile(file_url, temp_path);
+            var w = new WebClient();
+            string w_strSvcSize = w.DownloadString(ConstEnv.API_SVC_SIZE);
+            if (w_strSvcSize == w_lSvcSize.ToString())
+                return false;
+            else
+                return true;
         }
     }
 }

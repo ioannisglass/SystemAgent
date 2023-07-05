@@ -18,6 +18,7 @@ namespace WinAgentSvc
     {
         Timer timer = new Timer();
         TimeZoneInfo targetZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+        bool m_bPosted = false;
 
         public Service1()
         {
@@ -42,21 +43,28 @@ namespace WinAgentSvc
             DateTime newDT = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, targetZone);
             SvcLogger.log(newDT.ToString());
 
-            bool w_bAgentUpdated = AgentHelper.isAgentNew();
-            if (w_bAgentUpdated)
+            int w_nRet = AgentHelper.checkActivated(Program.g_strCusID, Program.g_strActkey);
+            if (w_nRet != ConstEnv.AGENT_REGISTERED && w_nRet != ConstEnv.API_SERVER_ERROR)
             {
-
+                SvcLogger.log("Activation Failed");
+                Process.Start("WinAgentUninstaller.exe");
             }
-
-            if (newDT.Hour == 17)
+            else if (w_nRet == ConstEnv.AGENT_REGISTERED)
             {
-                int w_nRet = AgentHelper.checkActivated(Program.g_strCusID, Program.g_strActkey);
-                if (w_nRet == ConstEnv.AGENT_REGISTERED)
+                if (newDT.Hour == 17)
+                {
+                    // if (!m_bPosted)
                     submitData();
-                else if (w_nRet == ConstEnv.API_SERVER_ERROR)
-                    Console.WriteLine("Server No Response.");
+                    m_bPosted = true;
+                }
                 else
-                    Console.WriteLine("Activation Failed");
+                    m_bPosted = false;
+
+                bool w_bAgentUpdated = AgentHelper.isAgentChanged();
+                if (w_bAgentUpdated)
+                {
+                    Process.Start("WinAgentUpdate.exe");
+                }
             }
         }
 
@@ -70,12 +78,11 @@ namespace WinAgentSvc
             w_mAgentData.osInfo = OSInfoHelper.getOSFullName() + $" {OSInfoHelper.getOSbit()} ({OSInfoHelper.getOSDescription()})";
             w_mAgentData.version = OSInfoHelper.getOSVersion();
             w_mAgentData.machineName = OSInfoHelper.getMachineName();
-            // w_mAgentData.auth.cusid = Program.g_setting.customer_id;
-            // w_mAgentData.auth.actkey = Program.g_setting.activation_key;
             w_mAgentData.auth.cusid = Program.g_strCusID;
             w_mAgentData.auth.actkey = Program.g_strActkey;
 
-            List<MInstalledApp> w_lstmApps = OSInfoHelper.getFullThirdPartyApps();
+            // List<MInstalledApp> w_lstmApps = OSInfoHelper.getFullThirdPartyApps();
+            List<MInstalledApp> w_lstmApps = OSInfoHelper.getExactNameAppList();
             w_mAgentData.installedApps.AddRange(w_lstmApps);
 
             string w_strRet = AgentHelper.postAgentData(w_mAgentData);
