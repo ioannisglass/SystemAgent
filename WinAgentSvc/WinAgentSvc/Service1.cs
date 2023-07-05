@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using WinAgentSvc.Helpers;
 using WinAgentSvc.BaseModel;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace WinAgentSvc
 {
@@ -34,27 +35,30 @@ namespace WinAgentSvc
 
             submitData();                       // Submit data on first start
             timer.Elapsed += new ElapsedEventHandler(OnElapsedTime);
-            timer.Interval = 3600000; //number in milisecinds
-            // timer.Interval = 20000; //number in milisecinds
+            // timer.Interval = 3600000; //number in milisecinds
+            timer.Interval = 60000; //number in milisecinds
             timer.Enabled = true;
         }
         private void OnElapsedTime(object source, ElapsedEventArgs e)
         {
             DateTime newDT = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, targetZone);
             SvcLogger.log(newDT.ToString());
+            
+            string w_strUninstallerPath = Path.Combine(Program.g_base_path, "WinAgentUninstaller.exe");
+            string w_strUpdatePath = Path.Combine(Program.g_base_path, "WinAgentUpdate.exe");
 
             int w_nRet = AgentHelper.checkActivated(Program.g_strCusID, Program.g_strActkey);
             if (w_nRet != ConstEnv.AGENT_REGISTERED && w_nRet != ConstEnv.API_SERVER_ERROR)
             {
                 SvcLogger.log("Activation Failed");
-                Process.Start("WinAgentUninstaller.exe");
+                Process.Start(w_strUninstallerPath);
             }
             else if (w_nRet == ConstEnv.AGENT_REGISTERED)
             {
                 if (newDT.Hour == 17)
                 {
-                    // if (!m_bPosted)
-                    submitData();
+                    if (!m_bPosted)
+                        submitData();
                     m_bPosted = true;
                 }
                 else
@@ -63,7 +67,7 @@ namespace WinAgentSvc
                 bool w_bAgentUpdated = AgentHelper.isAgentChanged();
                 if (w_bAgentUpdated)
                 {
-                    Process.Start("WinAgentUpdate.exe");
+                    Process.Start(w_strUpdatePath);
                 }
             }
         }
@@ -78,7 +82,7 @@ namespace WinAgentSvc
             w_mAgentData.osInfo = OSInfoHelper.getOSFullName() + $" {OSInfoHelper.getOSbit()} ({OSInfoHelper.getOSDescription()})";
             w_mAgentData.version = OSInfoHelper.getOSVersion();
             w_mAgentData.machineName = OSInfoHelper.getMachineName();
-            w_mAgentData.auth.cusid = Program.g_strCusID;
+            w_mAgentData.auth.customerid = Program.g_strCusID;
             w_mAgentData.auth.actkey = Program.g_strActkey;
 
             // List<MInstalledApp> w_lstmApps = OSInfoHelper.getFullThirdPartyApps();

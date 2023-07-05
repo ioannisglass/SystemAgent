@@ -9,16 +9,16 @@ namespace WinAgentSvc.BaseModel
     [Serializable]
     public class MAuth
     {
-        public string cusid { get; set; }
+        public string customerid { get; set; }
         public string actkey { get; set; }
         public MAuth()
         {
-            cusid = string.Empty;
+            customerid = string.Empty;
             actkey = string.Empty;
         }
-        public MAuth(string cusid, string actkey)
+        public MAuth(string customerid, string actkey)
         {
-            this.cusid = cusid;
+            this.customerid = customerid;
             this.actkey = actkey;
         }
     }
