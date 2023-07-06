@@ -39,7 +39,7 @@ namespace WinAgentUninstaller
 
             if (ServiceExts.IsServiceInstalled())
             {
-                Console.WriteLine("Service is already installed in another directory.");
+                Console.WriteLine("Service is already installed.");
                 return;
             }
 
