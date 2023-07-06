@@ -86,11 +86,13 @@ namespace WinAgentUpdate
                     try
                     {
                         File.Delete(w_strSvcFullPath);
+                        SvcLogger.log($"{w_strSvcFullPath} removed.");
                         break;
                     }
                     catch (Exception ex)
                     {
                         SvcLogger.log(ex.Message);
+                        SvcLogger.log("Will try to remove again.");
                         w_nRetryNum++;
                         if (w_nRetryNum >= 5)
                         {
