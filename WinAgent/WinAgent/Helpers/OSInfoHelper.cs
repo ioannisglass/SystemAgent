@@ -97,9 +97,9 @@ namespace WinAgent.Helpers
 
             finalList = win32AppsCU.Concat(win32AppsLM).Concat(win64AppsCU).Concat(win64AppsLM).Concat(uwpApps);
 
-            finalList = finalList.GroupBy(d => d.displayName).Select(d => d.First());
+            finalList = finalList.GroupBy(d => d.name).Select(d => d.First());
 
-            return finalList.OrderBy(o => o.displayName).ToList();
+            return finalList.OrderBy(o => o.name).ToList();
         }
 
         public static List<MInstalledApp> getThirdPartyApps(RegistryKey regKey, string registryKey)
@@ -134,10 +134,10 @@ namespace WinAgent.Helpers
 
                             list.Add(new MInstalledApp()
                             {
-                                displayName = displayName.Trim(),
-                                installationLocation = "",
-                                displayVersion = displayVersion ?? "Unknown",
-                                publisher = publisher ?? "Unknown"
+                                name = displayName.Trim(),
+                                loc = "",
+                                ver = displayVersion ?? "Unknown",
+                                pub = publisher ?? "Unknown"
                             });
                         }
                     }
@@ -175,10 +175,10 @@ namespace WinAgent.Helpers
 
                         list.Add(new MInstalledApp()
                         {
-                            displayName = w_strDisplayName,
-                            installationLocation = "",
-                            displayVersion = w_strVersion ?? "Unknown",
-                            publisher = w_strPublisher ?? "Unknown"
+                            name = w_strDisplayName,
+                            loc = "",
+                            ver = w_strVersion ?? "Unknown",
+                            pub = w_strPublisher ?? "Unknown"
                         });
 
 
@@ -200,6 +200,39 @@ namespace WinAgent.Helpers
         static bool isMSStoreAppWithName(string _strDisplayName)
         {
             return _strDisplayName?.StartsWith("Microsoft.") ?? false;
+        }
+
+        public static List<MInstalledApp> getExactNameAppList()
+        {
+            List<MInstalledApp> w_lstmApps = OSInfoHelper.getFullThirdPartyApps();
+            if (w_lstmApps == null || w_lstmApps.Count == 0)
+                return new List<MInstalledApp>();
+            foreach(MInstalledApp w_mInstalledApp in w_lstmApps)
+            {
+                string w_strName = w_mInstalledApp.name;
+                w_strName = w_strName.Replace(w_mInstalledApp.ver, "").Trim();
+                w_strName = w_strName.Replace("(x64)", "").Trim();
+                w_strName = w_strName.Replace("(x86)", "").Trim();
+                w_strName = w_strName.Replace("(64-bit)", "").Trim();
+                w_strName = w_strName.Replace("en-us", "").Trim();
+                w_strName = w_strName.Replace("x86_64", "").Trim();
+                w_strName = w_strName.Replace("x86", "").Trim();
+                w_strName = w_strName.Replace("x64", "").Trim();
+                w_strName = w_strName.Split('.')[0].Trim();
+
+                int w_nLast = 0;
+                bool w_bRet = int.TryParse(w_strName.Split(' ').Last(), out w_nLast);
+                if (w_bRet)
+                    w_strName = w_strName.Replace(w_strName.Split(' ').Last(), "").Trim();
+
+                if (w_strName.Contains("("))
+                    w_strName = w_strName.Substring(0, w_strName.IndexOf("(")).Trim();
+
+                if (w_strName.Last() == '-')
+                    w_strName = w_strName.Substring(0, w_strName.Length - 1);
+                w_mInstalledApp.name = w_strName;
+            }
+            return w_lstmApps;
         }
     }
 }

@@ -108,6 +108,13 @@ namespace WinAgent
             // p.WaitForExit();
             // Console.WriteLine(output);
 
+            // string w_strTemp = "D:\\Projects\\SystemAgent\\WinAgentSvc\\WinAgentSvc\\bin\\x64\\Release\\WinAgentSvc.exe";
+            // string w_strTemp = "D:\\Projects\\SystemAgent\\WinAgent\\WinAgent\\bin\\x64\\Debug\\WinAgent.exe";
+            // Console.WriteLine(new FileInfo(w_strTemp).Length);
+
+            // var w = new WebClient();
+            // string w_strSvcSize = w.DownloadString("https://api.vulnagent.com/api/svcsize");
+            // Console.WriteLine(w_strSvcSize);
             Application.Run(new Form1());
             // using (var appx = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Appx"))
             // {
@@ -147,7 +154,7 @@ namespace WinAgent
 
                     foreach (string subDirectory in subDirectories)
                     {
-                        string applicationName = Path.GetFileName(subDirectory);
+                        string applicationName = System.IO.Path.GetFileName(subDirectory);
                         installedApplications.Add(applicationName);
                     }
                 }

@@ -16,9 +16,9 @@ namespace WinAgent.BaseModel
             customerid = string.Empty;
             actkey = string.Empty;
         }
-        public MAuth(string cusid, string actkey)
+        public MAuth(string customerid, string actkey)
         {
-            this.customerid = cusid;
+            this.customerid = customerid;
             this.actkey = actkey;
         }
     }

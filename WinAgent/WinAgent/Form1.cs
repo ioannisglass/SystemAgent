@@ -38,13 +38,14 @@ namespace WinAgent
             lbComputerName.Text = "Computer Name: " + OSInfoHelper.getMachineName();
 
             // List<MInstalledApp> w_lstmInstalledApp = OSInfoHelper.GetFullListInstalledApplication();
-            List<MInstalledApp> w_lstmInstalledApp = OSInfoHelper.getFullThirdPartyApps();
+            // List<MInstalledApp> w_lstmInstalledApp = OSInfoHelper.getFullThirdPartyApps();
+            List<MInstalledApp> w_lstmInstalledApp = OSInfoHelper.getExactNameAppList();
             foreach (MInstalledApp app in w_lstmInstalledApp)
             {
                 ListViewItem w_lvmInstalledApp = new ListViewItem((lstvApps.Items.Count + 1).ToString());
-                w_lvmInstalledApp.SubItems.Add(app.displayName);
+                w_lvmInstalledApp.SubItems.Add(app.name);
                 // w_lvmInstalledApp.SubItems.Add(app.InstallationLocation);
-                w_lvmInstalledApp.SubItems.Add(app.displayVersion);
+                w_lvmInstalledApp.SubItems.Add(app.ver);
                 lstvApps.Items.Add(w_lvmInstalledApp);
             }
         }
@@ -58,7 +59,7 @@ namespace WinAgent
             w_mAgentData.auth.customerid = Program.g_setting.customer_id;
             w_mAgentData.auth.actkey = Program.g_setting.activation_key;
 
-            w_mAgentData.installedApps.AddRange(OSInfoHelper.getFullThirdPartyApps());
+            w_mAgentData.installedApps.AddRange(OSInfoHelper.getExactNameAppList());
 
             string w_strRet = AgentHelper.postAgentData(w_mAgentData);
             MessageBox.Show(w_strRet);

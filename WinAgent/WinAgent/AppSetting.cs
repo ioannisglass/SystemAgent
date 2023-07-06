@@ -51,8 +51,8 @@ namespace MailParser
 
     public class UserSetting : AppSettings<UserSetting>
     {
-        public string customer_id = "testagent1";
-        public string activation_key = "activationkey1";
+        public string customer_id = "9533286469815617";
+        public string activation_key = "8682068f-0cc6-4c24-9ca6-50f8c1b52545";
         public string api_base = "http://192.168.8.171:5000";
         public string api_activate = "/api/activate";
         public string api_submit = "/api/submit";
