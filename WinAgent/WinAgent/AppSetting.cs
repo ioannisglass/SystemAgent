@@ -51,10 +51,14 @@ namespace MailParser
 
     public class UserSetting : AppSettings<UserSetting>
     {
-        public string customer_id = "9533286469815617";
-        public string activation_key = "8682068f-0cc6-4c24-9ca6-50f8c1b52545";
-        public string api_base = "http://192.168.8.171:5000";
-        public string api_activate = "/api/activate";
-        public string api_submit = "/api/submit";
+        public string customer_id = "1766528105133050";
+        public string activation_key = "78bde905-2a9a-49b2-ba1e-56b8b7f06713";
+
+        public string API_BASE_URL = "https://api.vulnagent.com";
+        public string API_AUTH_URL = "/api/activate";
+        public string API_SUBMIT_URL = "/api/submit";
+        public string API_SVC_FILE_URL = "https://api.vulnagent.com/uploads/WinAgentSvc.exe";
+        public string API_SVC_SIZE = "/api/svcsize";
+        public string API_APPTOREMOVE = "/api/uninstall";
     }
 }

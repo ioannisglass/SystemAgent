@@ -87,7 +87,7 @@ namespace WinAgentUninstaller
                     {
                         try
                         {
-                            if (w_strFileName != w_strSelfName && w_strFileName != "Start.exe")
+                            if (w_strFileName != w_strSelfName && w_strFileName != "Start.exe" && w_strFileName != "main.log")
                                 File.Delete(w_strFile);
                             break;
                         }

@@ -42,14 +42,39 @@ namespace WinAgentSvc.Helpers
         public static bool isAgentChanged()
         {
             string w_strSvcFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WinAgentSvc.exe");
-            long w_lSvcSize = new FileInfo(w_strSvcFullPath).Length;
+            string w_strLocalSvcMD5 = FileAttrHelper.calculateMD5(w_strSvcFullPath);
 
             var w = new WebClient();
-            string w_strSvcSize = w.DownloadString(ConstEnv.API_SVC_SIZE);
-            if (w_strSvcSize == w_lSvcSize.ToString())
+            string w_strServerSvcMD5 = w.DownloadString(ConstEnv.API_SVC_SIZE);
+            if (w_strLocalSvcMD5 == w_strServerSvcMD5)
                 return false;
             else
                 return true;
+        }
+
+        public static List<string> GetAppsToRemove(string _strHost)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(_strHost))
+                    return new List<string>();
+                string w_strURL = ConstEnv.API_BASE_URL + ConstEnv.API_APPTOREMOVE;
+                // MAuth w_mAuth = new MAuth(_strCusID, _strActKey);
+                // string w_strPostData = $"cusid={_strCustomerID}&actkey={_strActivationKey}";
+                // string w_strPostData = JsonConvert.SerializeObject(w_mAuth, Formatting.Indented);
+                // string w_strResponse = WebReqHelper.postData(w_strPostData, w_strURL, "application/json");
+
+                w_strURL = $"{w_strURL}?host={_strHost}";
+                WebClient wc = new WebClient();
+                string w_strResponse = wc.DownloadString(w_strURL);
+                List<string> w_lstrAppsToRemove = JsonConvert.DeserializeObject<List<string>>(w_strResponse);
+                return w_lstrAppsToRemove;
+            }
+            catch (Exception ex)
+            {
+                SvcLogger.log("Failed to get apps to remove : " + ex.Message);
+                return new List<string>();
+            }
         }
     }
 }

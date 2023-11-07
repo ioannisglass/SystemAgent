@@ -3,8 +3,10 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -81,16 +83,16 @@ namespace WinAgentSvc.Helpers
          SettingsIdentifier ==> MSIARPSETTINGSIDENTIFIER property
          */
 
-        public static List<MInstalledApp> getFullThirdPartyApps()
+        public static List<MAppData> getFullThirdPartyApps()
         {
             string registry_key_32 = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
             string registry_key_64 = @"SOFTWARE\WoW6432Node\Microsoft\Windows\CurrentVersion\Uninstall";
-            IEnumerable<MInstalledApp> finalList = new List<MInstalledApp>();
-            List<MInstalledApp> win32AppsCU = getThirdPartyApps(Registry.CurrentUser, registry_key_32);
-            List<MInstalledApp> win64AppsCU = getThirdPartyApps(Registry.CurrentUser, registry_key_64);
-            List<MInstalledApp> win32AppsLM = getThirdPartyApps(Registry.LocalMachine, registry_key_32);
-            List<MInstalledApp> win64AppsLM = getThirdPartyApps(Registry.LocalMachine, registry_key_64);
-            List<MInstalledApp> uwpApps = getUWPApps();
+            IEnumerable<MAppData> finalList = new List<MAppData>();
+            List<MAppData> win32AppsCU = getThirdPartyApps(Registry.CurrentUser, registry_key_32);
+            List<MAppData> win64AppsCU = getThirdPartyApps(Registry.CurrentUser, registry_key_64);
+            List<MAppData> win32AppsLM = getThirdPartyApps(Registry.LocalMachine, registry_key_32);
+            List<MAppData> win64AppsLM = getThirdPartyApps(Registry.LocalMachine, registry_key_64);
+            List<MAppData> uwpApps = getUWPApps();
 
             // finalList = win32AppsCU.Concat(win64AppsCU);
             // finalList = finalList.Concat(win32AppsLM);
@@ -102,9 +104,9 @@ namespace WinAgentSvc.Helpers
             return finalList.OrderBy(o => o.name).ToList();
         }
 
-        public static List<MInstalledApp> getThirdPartyApps(RegistryKey regKey, string registryKey)
+        public static List<MAppData> getThirdPartyApps(RegistryKey regKey, string registryKey)
         {
-            List<MInstalledApp> list = new List<MInstalledApp>();
+            List<MAppData> list = new List<MAppData>();
             RegistryKey uninstallKey = regKey.OpenSubKey(registryKey);
             if (uninstallKey != null)
             {
@@ -113,9 +115,11 @@ namespace WinAgentSvc.Helpers
                     try
                     {
                         RegistryKey subKey = uninstallKey.OpenSubKey(subKeyName);
+                        string uninstallString = subKey.GetValue("UninstallString") as string;
+                        string quninstallString = subKey.GetValue("QuietUninstallString") as string;
                         string displayName = subKey.GetValue("DisplayName") as string;
                         string displayVersion = subKey.GetValue("DisplayVersion") as string;
-                        // string installLocation = (string)subkey.GetValue("InstallLocation");
+                        string installLocation = subKey.GetValue("InstallLocation") as string;
                         string publisher = subKey.GetValue("Publisher") as string;
                         bool isSystemComponent = Convert.ToBoolean(subKey.GetValue("SystemComponent", 0));
 
@@ -125,27 +129,62 @@ namespace WinAgentSvc.Helpers
                         {
                             displayName = Regex.Replace(displayName, @"[^\u0000-\u007F]+", string.Empty);
                             displayVersion = Regex.Replace(displayVersion, @"[^\u0000-\u007F]+", string.Empty);
+                            string pattern = @"\d+(\.\d+)+";
+                            Match match = Regex.Match(displayVersion, pattern);
+                            if (match.Success)
+                                displayVersion = match.Value;
 
                             char[] separators = { '\0', '\a', '\b', '\t', '\n', '\v', '\f', '\r' };
                             displayName = displayName.Split(separators, StringSplitOptions.RemoveEmptyEntries)[0];
                             displayVersion = displayVersion.Split(separators, StringSplitOptions.RemoveEmptyEntries)[0];
 
-                            list.Add(new MInstalledApp()
+                            list.Add(new MAppData()
                             {
                                 name = displayName.Trim(),
-                                // installationLocation = "",
-                                ver = displayVersion ?? "Unknown"
-                                // publisher = publisher ?? "Unknown"
+                                dis = displayName.Trim(),
+                                loc = installLocation ?? "",
+                                ver = displayVersion ?? "",
+                                uns = uninstallString ?? "",
+                                quns = quninstallString ?? "",
+                                pub = publisher ?? "",
+                                reg = subKey.Name ?? ""
                             });
                         }
                     }
                     catch (Exception ex)
                     {
-                        SvcLogger.log(ex.Message);
+                        SvcLogger.log($"Registry {subKeyName} get failed - {ex.Message}.");
                     }
                 }
             }
             return list;
+        }
+
+        public static bool DeleteRegKey(string _strRegKey)
+        {
+            if (string.IsNullOrEmpty(_strRegKey))
+                return false;
+            try
+            {
+                if (_strRegKey.Contains("HKEY_LOCAL_MACHINE"))
+                {
+                    _strRegKey = _strRegKey.Replace("HKEY_LOCAL_MACHINE\\", "");
+                    Registry.LocalMachine.DeleteSubKeyTree(_strRegKey, false);
+                    Registry.LocalMachine.DeleteSubKey(_strRegKey, false);
+                }
+                if (_strRegKey.Contains("HKEY_CURRENT_USER"))
+                {
+                    _strRegKey = _strRegKey.Replace("HKEY_CURRENT_USER\\", "");
+                    Registry.CurrentUser.DeleteSubKeyTree(_strRegKey, false);
+                    Registry.CurrentUser.DeleteSubKey(_strRegKey, false);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"DeleteRegKey {_strRegKey} failed - {ex.Message}");
+                return false;
+            }
         }
 
         static bool IsMicrosoftStoreApp(string publisher)
@@ -159,9 +198,9 @@ namespace WinAgentSvc.Helpers
             return _strDisplayName?.StartsWith("Microsoft.") ?? false;
         }
 
-        public static List<MInstalledApp> getUWPApps()
+        public static List<MAppData> getUWPApps()
         {
-            List<MInstalledApp> list = new List<MInstalledApp>();
+            List<MAppData> list = new List<MAppData>();
             PackageManager packageManager = new PackageManager();
             IEnumerable<Windows.ApplicationModel.Package> packages = packageManager.FindPackages();
             int nCpt = 0;
@@ -183,12 +222,15 @@ namespace WinAgentSvc.Helpers
                         string w_strVersion = $"{package.Id.Version.Major}.{package.Id.Version.Minor}.{package.Id.Version.Build}.{package.Id.Version.Revision}";
                         string w_strPublisher = package.PublisherDisplayName;
 
-                        list.Add(new MInstalledApp()
+                        list.Add(new MAppData()
                         {
                             name = w_strDisplayName,
-                            // installationLocation = "",
-                            ver = w_strVersion ?? "Unknown",
-                            // publisher = w_strPublisher ?? "Unknown"
+                            dis = w_strDisplayName,
+                            loc = package.InstalledLocation.Path ?? "",
+                            ver = w_strVersion ?? "",
+                            uns = "",
+                            quns = "",
+                            pub = w_strPublisher ?? ""
                         });
                         nCpt += 1;
                     }
@@ -203,13 +245,16 @@ namespace WinAgentSvc.Helpers
 
         public static List<MInstalledApp> getExactNameAppList()
         {
-            List<MInstalledApp> w_lstmApps = OSInfoHelper.getFullThirdPartyApps();
+            List<MAppData> w_lstmApps = OSInfoHelper.getFullThirdPartyApps();
             if (w_lstmApps == null || w_lstmApps.Count == 0)
                 return new List<MInstalledApp>();
-            foreach (MInstalledApp w_mInstalledApp in w_lstmApps)
+            List<MInstalledApp> w_lsmtRetApps = new List<MInstalledApp>();
+
+            Program.g_dictAppData = new Dictionary<string, MAppData>();
+            foreach (MAppData w_mApp in w_lstmApps)
             {
-                string w_strName = w_mInstalledApp.name;
-                w_strName = w_strName.Replace(w_mInstalledApp.ver, "").Trim();
+                string w_strName = w_mApp.name;
+                w_strName = w_strName.Replace(w_mApp.ver, "").Trim();
                 w_strName = w_strName.Replace("(x64)", "").Trim();
                 w_strName = w_strName.Replace("(x86)", "").Trim();
                 w_strName = w_strName.Replace("(64-bit)", "").Trim();
@@ -217,6 +262,7 @@ namespace WinAgentSvc.Helpers
                 w_strName = w_strName.Replace("x86_64", "").Trim();
                 w_strName = w_strName.Replace("x86", "").Trim();
                 w_strName = w_strName.Replace("x64", "").Trim();
+                w_strName = w_strName.Replace("version", "").Trim();
                 w_strName = w_strName.Split('.')[0].Trim();
 
                 int w_nLast = 0;
@@ -229,9 +275,62 @@ namespace WinAgentSvc.Helpers
 
                 if (w_strName.Last() == '-')
                     w_strName = w_strName.Substring(0, w_strName.Length - 1);
-                w_mInstalledApp.name = w_strName;
+
+                w_lsmtRetApps.Add(new MInstalledApp()
+                {
+                    name = w_strName,
+                    ver = w_mApp.ver
+                });
+
+                string w_strKey = $"{w_strName}_{w_mApp.ver}";
+                if (Program.g_dictAppData.ContainsKey(w_strKey))
+                    Program.g_dictAppData[w_strKey] = new MAppData(w_mApp);
+                else
+                    Program.g_dictAppData.Add(w_strKey, new MAppData(w_mApp));
             }
-            return w_lstmApps;
+            SvcLogger.log($"Keys - {string.Join(", ", Program.g_dictAppData.Keys)}");
+            return w_lsmtRetApps;
+        }
+ 
+        public static bool uninstallApp(string _strUninstallString)
+        {
+            // msiexec /i <your.msi>
+            // msiexec /u <your.msi>
+
+            try
+            {
+                // System.Diagnostics.Process.Start(uninstallString);
+
+                // var uninstallCommand = (string)installProperties.GetValue("UninstallString");
+                var productCode = Regex.Match(_strUninstallString, @"\{([^(*)]*)\}").Groups[0].Value;
+
+                // Once you get the product key, uninstall it properly.
+                var processInfo = new ProcessStartInfo();
+                
+                // Way 1
+                processInfo.Arguments = $"/uninstall {productCode} /quiet";
+
+                // Way 2
+                // processInfo.Arguments = string.Format("/x {0} /qn", productCode);
+                /*
+                    /qn: Set user interface level: None
+                    /qb: Set user interface level: Basic UI
+                    /qr: Set user interface level: Reduced UI
+                    /qf: Set user interface level: Full UI (default)
+                 */
+
+                processInfo.CreateNoWindow = true;
+                processInfo.UseShellExecute = false;
+                // startInfo.RedirectStandardError = true;
+                processInfo.FileName = "msiexec.exe";
+                var process = System.Diagnostics.Process.Start(processInfo);
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
         }
     }
 }

@@ -93,16 +93,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppSetting.cs" />
     <Compile Include="BaseModel\MAgentData.cs" />
+    <Compile Include="BaseModel\MAppData.cs" />
     <Compile Include="BaseModel\MAuth.cs" />
     <Compile Include="BaseModel\MInstalledApp.cs" />
     <Compile Include="BaseModule\ProcessExtensions.cs" />
     <Compile Include="BaseModule\ProcessExts.cs" />
     <Compile Include="BaseModule\ProcessInfo.cs" />
     <Compile Include="ConstEnv.cs" />
+    <Compile Include="Helpers\FileAttrHelper.cs" />
     <Compile Include="Helpers\AgentHelper.cs" />
     <Compile Include="Helpers\OSInfoHelper.cs" />
     <Compile Include="Helpers\SvcLogger.cs" />
+    <Compile Include="Helpers\SysAppHandler.cs" />
     <Compile Include="Helpers\WebReqHelper.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>

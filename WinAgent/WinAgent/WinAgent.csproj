@@ -120,6 +120,7 @@
   <ItemGroup>
     <Compile Include="AppSetting.cs" />
     <Compile Include="BaseModel\MAgentData.cs" />
+    <Compile Include="BaseModel\MAppData.cs" />
     <Compile Include="BaseModel\MAuth.cs" />
     <Compile Include="BaseModel\MInstalledApp.cs" />
     <Compile Include="ConstEnv.cs" />
@@ -136,8 +137,13 @@
       <DependentUpon>frmActivate.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AgentHelper.cs" />
+    <Compile Include="Helpers\AppHandler\AppHandler.cs" />
+    <Compile Include="Helpers\AppHandler\AppUninstaller.cs" />
+    <Compile Include="Helpers\FileAttrHelper.cs" />
     <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Helpers\OSInfoHelper.cs" />
+    <Compile Include="Helpers\ProcessExts.cs" />
+    <Compile Include="Helpers\SysAppHandler.cs" />
     <Compile Include="Helpers\WebReqHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

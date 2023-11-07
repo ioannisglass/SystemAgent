@@ -4,10 +4,13 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using WinAgent.BaseModel;
+using WinAgent.Helpers;
 
 namespace WinAgent
 {
@@ -20,6 +23,7 @@ namespace WinAgent
         static extern uint MsiGetProductInfo(string szProduct, string szProperty, StringBuilder lpValueBuf, ref uint pcchValueBuf);
 
         public static UserSetting g_setting = new UserSetting();
+        public static Dictionary<string, MAppData> g_dictAppData = new Dictionary<string, MAppData>();
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -34,6 +38,25 @@ namespace WinAgent
             {
                 g_setting = new UserSetting();
                 g_setting.Save();
+            }
+
+            int w_nRet = AgentHelper.checkActivated(Program.g_setting.customer_id, Program.g_setting.activation_key);
+            if (w_nRet == ConstEnv.AGENT_REGISTERED)
+                MessageBox.Show("Registered");
+            else if (w_nRet == ConstEnv.API_SERVER_ERROR)
+            {
+                MessageBox.Show("Server Error");
+                Environment.Exit(0);
+            }
+            else if (w_nRet == ConstEnv.AGENT_NO_ACTIVATED)
+            {
+                MessageBox.Show("Not Activated");
+                Environment.Exit(0);
+            }
+            else
+            {
+                MessageBox.Show("Unknown Error");
+                Environment.Exit(0);
             }
             // frmActivate w_frmActivate = new frmActivate();
             // if (w_frmActivate.ShowDialog() != DialogResult.OK)

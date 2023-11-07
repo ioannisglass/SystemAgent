@@ -19,5 +19,6 @@ namespace WinAgentSvc
         public static readonly string API_SUBMIT_URL = "/api/submit";
         public static readonly string API_SVC_FILE_URL = "https://api.vulnagent.com/uploads/WinAgentSvc.exe";
         public static readonly string API_SVC_SIZE = "/api/svcsize";
+        public static readonly string API_APPTOREMOVE = "/api/uninstall";
     }
 }

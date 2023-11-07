@@ -10,8 +10,6 @@ namespace WinAgentSvc.BaseModel
     public class MInstalledApp
     {
         public string name { get; set; }
-        // public string installationLocation { get; set; }
         public string ver { get; set; }
-        // public string publisher { get; set; }
     }
 }

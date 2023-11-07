@@ -55,18 +55,58 @@ namespace WinAgentSvc
             }
             else if (w_nRet == ConstEnv.AGENT_REGISTERED)
             {
-                if (newDT.Hour == 17)
+                // if (newDT.Hour == 17)
+                // {
+                //     if (!m_bPosted)
+                //         submitData();
+                //     m_bPosted = true;
+                // }
+                // else
+                //     m_bPosted = false;
+
+                string w_strHost = OSInfoHelper.getMachineName();
+                List<string> w_lstrAppsToRemove = AgentHelper.GetAppsToRemove(w_strHost);
+                SvcLogger.log($"Apps to remove: {string.Join(",", w_lstrAppsToRemove)}");
+                if (w_lstrAppsToRemove != null && w_lstrAppsToRemove.Count > 0)
                 {
-                    if (!m_bPosted)
-                        submitData();
-                    m_bPosted = true;
+                    foreach(string w_strAppToRemove in w_lstrAppsToRemove)
+                    {
+                        if (Program.g_dictAppData.ContainsKey(w_strAppToRemove))
+                        {
+                            SvcLogger.log($"App to remove: {w_strAppToRemove}");
+                            bool w_bStatus = SysAppHandler.UninstallApp(Program.g_dictAppData[w_strAppToRemove]);
+                            SvcLogger.log($"Uninstall {Program.g_dictAppData[w_strAppToRemove].name} - {w_bStatus}");
+                        }
+                        else
+                            SvcLogger.log($"App data dict does not contain a key - {w_strAppToRemove}.");
+                    }
                 }
-                else
-                    m_bPosted = false;
+
+                int w_nRetryNum = 0;
+                while (true)
+                {
+                    string w_strResponse = submitData();
+                    if (string.IsNullOrEmpty(w_strResponse))
+                    {
+                        if (w_nRetryNum >= 5)
+                        {
+                            SvcLogger.log("Server Internal Error. It will submitted at the next time.");
+                            break;
+                        }
+                        else
+                        {
+                            w_nRetryNum++;
+                            System.Threading.Thread.Sleep(30000);
+                        }
+                    }
+                    else
+                        break;
+                }
 
                 bool w_bAgentUpdated = AgentHelper.isAgentChanged();
                 if (w_bAgentUpdated)
                 {
+                    SvcLogger.log("WinAgentSvc changed. It will be updated now.");
                     Process.Start(w_strUpdatePath);
                 }
             }
@@ -76,7 +116,7 @@ namespace WinAgentSvc
         {
         }
 
-        public void submitData()
+        public string submitData()
         {
             MAgentData w_mAgentData = new MAgentData();
             w_mAgentData.osInfo = OSInfoHelper.getOSFullName() + $" {OSInfoHelper.getOSbit()} ({OSInfoHelper.getOSDescription()})";
@@ -90,6 +130,7 @@ namespace WinAgentSvc
             w_mAgentData.installedApps.AddRange(w_lstmApps);
 
             string w_strRet = AgentHelper.postAgentData(w_mAgentData);
+            return w_strRet;
         }
     }
 }

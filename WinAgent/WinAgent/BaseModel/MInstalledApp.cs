@@ -13,5 +13,6 @@ namespace WinAgent.BaseModel
         public string loc { get; set; }
         public string ver { get; set; }
         public string pub { get; set; }
+        public string uns { get; set; }
     }
 }
